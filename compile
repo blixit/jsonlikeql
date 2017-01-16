@@ -3,8 +3,10 @@
 #! /bin/bash
 
 PROJECT=jsonlikeql
+EXT=jql
 DIR=.
 EXEC=$DIR/makefile-unix/$PROJECT
+
 LOGFILE=build.log
 LOGGALGAS=galgas.log
 
@@ -31,6 +33,6 @@ fi
 ./makefile-unix/build.py
 
 #run after compiling to accelerate the development
-./makefile-unix/$PROJECT $DIR/$PROJECT/my.$PROJECT
+./makefile-unix/$PROJECT $DIR/files/my.$EXT
  
 
