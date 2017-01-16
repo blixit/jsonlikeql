@@ -1,0 +1,15 @@
+#--- Prologue routine
+before {
+}
+
+#--- 'when' clauses
+case . "jql"
+message "a source text file with the .jsonlikeql extension"
+grammar jsonlikeql_grammar
+?sourceFilePath:@lstring inSourceFile {
+  grammar jsonlikeql_grammar in inSourceFile
+}
+
+#--- Epilogue routine
+after {
+}

@@ -1,0 +1,9 @@
+syntax jsonlikeql_syntax (jsonlikeql_lexique) {
+
+rule <start_symbol> {
+  # ADD YOUR SYNTAX INSTRUCTIONS
+}
+
+# ADD OTHER RULES
+
+}

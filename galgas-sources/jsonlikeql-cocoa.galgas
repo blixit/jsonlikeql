@@ -1,0 +1,10 @@
+gui cocoa {
+  with option jsonlikeql_options
+
+  with lexique jsonlikeql_lexique {
+    fileExtension: "jsonlikeql"
+    title: "Source"
+    blockComment : "#"
+  }
+
+}

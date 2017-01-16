@@ -1,0 +1,17 @@
+build*
+makefile-*
+LatestMacOS*
+applicationBundleBase*
+codeblocks-*
+makefile-unix/jsonlikeql* 
+makefile-macosx/jsonlikeql*
+makefile-x86linux32-on-macosx/jsonlikeql*
+makefile-x86linux64-on-macosx/jsonlikeql*
+makefile-win32-on-macosx/jsonlikeql*
+LatestMacOS/jsonlikeql*
+codeblocks-windows/jsonlikeql*
+codeblocks-linux32/jsonlikeql*
+codeblocks-linux64/jsonlikeql*
+codeblocks-mac/jsonlikeql*
+
+

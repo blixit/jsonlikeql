@@ -1,0 +1,5 @@
+grammar jsonlikeql_grammar "LL1" {
+  syntax jsonlikeql_syntax
+  <start_symbol>
+}
+

@@ -1,0 +1,24 @@
+project (0:0:1) -> "jsonlikeql" {
+#--- Targets
+  %makefile-unix
+  #%makefile-macosx
+  #%makefile-x86linux32-on-macosx
+  #%makefile-x86linux64-on-macosx
+  #%makefile-win32-on-macosx
+  #%LatestMacOS
+  #%applicationBundleBase : "fr.what"
+  #%codeblocks-windows
+  #%codeblocks-linux32
+  #%codeblocks-linux64
+  #%codeblocks-mac
+
+#--- Source files
+  "galgas-sources/jsonlikeql-lexique.galgas"
+  "galgas-sources/jsonlikeql-options.galgas"
+  "galgas-sources/jsonlikeql-semantics.galgas"
+  "galgas-sources/jsonlikeql-syntax.galgas"
+  "galgas-sources/jsonlikeql-grammar.galgas"
+  "galgas-sources/jsonlikeql-cocoa.galgas"
+  "galgas-sources/jsonlikeql-program.galgas"
+}
+

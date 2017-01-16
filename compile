@@ -1,0 +1,36 @@
+#!/bin/bash
+
+#! /bin/bash
+
+PROJECT=jsonlikeql
+DIR=.
+EXEC=$DIR/makefile-unix/$PROJECT
+LOGFILE=build.log
+LOGGALGAS=galgas.log
+
+export PATH=$PATH:$DIR
+
+rm -f $LOGFILE
+galgas +${PROJECT}.galgasProject --emit-syntax-diagrams --output-html-grammar-file > $LOGFILE
+
+Erreurs=`awk '/./{line=$0} END{print line}' $LOGFILE | grep -Eo '[0-9]{1,4}' | awk '/[0-9]+/{i++}i==1'`
+echo "Erreurs or Warnings : " $Erreurs
+
+if [[ $Erreurs -gt 0 ]]; then 
+	echo "Errors found here !!"
+	cat $LOGFILE 
+	exit
+fi  
+
+if [ -f $EXEC ]; then
+	echo -e "Deleting old executable ..."
+	rm -f $EXEC*
+	echo -e "done !" 
+fi
+
+./makefile-unix/build.py
+
+#run after compiling to accelerate the development
+./makefile-unix/$PROJECT $DIR/$PROJECT/my.$PROJECT
+ 
+
