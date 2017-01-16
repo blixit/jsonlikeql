@@ -12,21 +12,37 @@ $identifier$ ! tokenString error message "an identifier"
 
 #--- This is the keyword list
 list keyWordList style keywordsStyle error message "the '%K' keyword" {
-  "begin",
-  "end"
+  "types",
+  "functions",
+  "query",
+
+# values and types
+  "null",
+  "true",
+  "false",  
+  "bool", 
+
+# available functions
+  "select",
+  "insert",
+  "update",
+  "delete"
 }
 
 rule 'a'->'z' |  'A'->'Z' {
   repeat
     enterCharacterIntoString (!?tokenString !*)
-  while 'a'->'z' | 'A'->'Z' | '_' | '0'->'9' :
+  while 'a'->'z' | 'A'->'Z' | '-' | '_' | '0'->'9' :
   end
   send search tokenString in keyWordList default $identifier$
 }
 
 #----------------------------------------------------------------------------------------------------------------------*
-#   Literal decimal integers                                                                                           *
+#   Literal decimal integers and double                                                                                        *
 #----------------------------------------------------------------------------------------------------------------------*
+
+#   Literal decimal integers  
+#----------------------------------------------
 
 style integerStyle -> "Integer Constants"
 @uint uint32value
@@ -35,6 +51,17 @@ $integer$ !uint32value style integerStyle error message "a 32-bit unsigned decim
 message decimalNumberTooLarge : "decimal number too large"
 message internalError : "internal error"
 
+#   Literal decimal double  
+#----------------------------------------------
+
+style realStyle -> "Real Constants"
+@double doublevalue
+$real$ !doublevalue style realStyle error message "a 64-bit floatting decimal number"
+
+message inConversionError : "inConversionError error"
+
+#----------------------------------------------
+
 rule '0'->'9' {
   enterCharacterIntoString (!?tokenString !*)
   repeat
@@ -42,9 +69,23 @@ rule '0'->'9' {
     enterCharacterIntoString (!?tokenString !*)
   while '_' :
   end
-  convertDecimalStringIntoUInt (!tokenString !?uint32value error decimalNumberTooLarge, internalError)
-  send $integer$
+  select 
+  case '.' :
+    enterCharacterIntoString (!?tokenString !*)
+    repeat
+    while '0'->'9' :
+      enterCharacterIntoString (!?tokenString !*)
+    while '_' :
+    end
+    convertStringToDouble( !tokenString !?doublevalue error inConversionError)
+    send $real$
+  default 
+    convertDecimalStringIntoUInt (!tokenString !?uint32value error decimalNumberTooLarge, internalError)
+    send $integer$
+  end
+  
 }
+ 
 
 #----------------------------------------------------------------------------------------------------------------------*
 #   Literal character strings                                                                                          *
@@ -58,7 +99,7 @@ message incorrectStringEnd : "string does not end with '\"'"
 
 rule '"' {
   repeat
-   while ' ' | '!' | '#'-> '\uFFFD' :
+  while ' ' | '!' | '#'-> '\uFFFD' :
     enterCharacterIntoString (!?tokenString !*)
   end
   select
@@ -75,7 +116,7 @@ rule '"' {
 
 style delimitersStyle -> "Delimiters"
 list delimitorsList style delimitersStyle error message "the '%K' delimitor" {
-  ":",    ",",    ";",   "!",  "{",  "}", "->", "@", "*", "-"
+  ":", ";", "'",  ",",  "{",  "}",  "(",  ")",  "[",  "]", "->"
 }
 
 rule list delimitorsList

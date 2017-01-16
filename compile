@@ -13,7 +13,7 @@ LOGGALGAS=galgas.log
 export PATH=$PATH:$DIR
 
 rm -f $LOGFILE
-galgas +${PROJECT}.galgasProject --emit-syntax-diagrams --output-html-grammar-file > $LOGFILE
+galgas  +${PROJECT}.galgasProject --emit-syntax-diagrams --output-html-grammar-file > $LOGFILE
 
 Erreurs=`awk '/./{line=$0} END{print line}' $LOGFILE | grep -Eo '[0-9]{1,4}' | awk '/[0-9]+/{i++}i==1'`
 echo "Erreurs or Warnings : " $Erreurs
@@ -33,6 +33,6 @@ fi
 ./makefile-unix/build.py
 
 #run after compiling to accelerate the development
-./makefile-unix/$PROJECT $DIR/files/my.$EXT
- 
-
+if [[ -f $DIR/files/my.$EXT && -f ./makefile-unix/$PROJECT ]]; then 
+	./makefile-unix/$PROJECT $DIR/files/my.$EXT
+fi
