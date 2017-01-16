@@ -111,6 +111,34 @@ rule '"' {
 }
 
 #----------------------------------------------------------------------------------------------------------------------*
+#   Literal character                                                                                                  *
+#----------------------------------------------------------------------------------------------------------------------*
+
+@char letter
+style charStyle -> "Character"
+$'char'$ ! letter style charStyle error message "a character constant \"...\""
+
+
+message incorrectCharEnd : "char does not end with '\''"
+
+rule ''' { 
+  select
+  case ' ' | '!' | '#'-> '\uFFFD' :
+    #enterCharacterIntoString (!?tokenString !*) 
+    #letter = [tokenString  !1]
+    enterCharacterIntoCharacter(!?letter !*)
+  default
+
+  end
+  select
+  case ''' :
+    send $'char'$
+  default
+    error incorrectCharEnd
+  end
+}
+
+#----------------------------------------------------------------------------------------------------------------------*
 #   Delimiters                                                                                                         *
 #----------------------------------------------------------------------------------------------------------------------*
 
