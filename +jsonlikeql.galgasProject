@@ -20,5 +20,7 @@ project (0:0:1) -> "jsonlikeql" {
   "galgas-sources/jsonlikeql-grammar.galgas"
   "galgas-sources/jsonlikeql-cocoa.galgas"
   "galgas-sources/jsonlikeql-program.galgas"
+
+  "galgas-sources/types-primitives-syntax.galgas"
 }
 

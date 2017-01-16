@@ -12,11 +12,13 @@ rule <start_symbol> {
   			$real$ ?n 
   			@double n2 = [n double] #+ 0.0006
   			log n2
+  		or
+  			@bool b = @bool.default
+  			<bool_definition> !?b
+  			log b
   		end
-
   	end
 }
 
-# ADD OTHER RULES
 
 }

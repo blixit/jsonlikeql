@@ -1,0 +1,13 @@
+syntax extension jsonlikeql_syntax {
+
+rule <bool_definition> ?!@bool b{
+	select 
+		$true$ 
+		b = true 
+	or
+		$false$ 
+		b = false
+	end
+}
+
+}
