@@ -1,31 +1,12 @@
 syntax jsonlikeql_syntax (jsonlikeql_lexique) {
 
 rule <start_symbol> {
+	$types$
+	
 	repeat
 	while
-  		select 
-  			@luint n
-  			$integer$ ?n 
-  			log n
-  		or
-  			@ldouble n
-  			$real$ ?n 
-  			@double n2 = [n double] #+ 0.0006
-  			log n2
-  		or
-  			@lchar c
-  			$'char'$ ?c
-  			log c
-  		or
-  			@lstring c
-  			$"string"$ ?c
-  			log c
-  		or
-  			@bool b = @bool.default
-  			<bool_definition> !?b
-  			log b
-  		end
-  	end
+		<class>
+	end
 }
 
 

@@ -20,7 +20,11 @@ list keyWordList style keywordsStyle error message "the '%K' keyword" {
   "null",
   "true",
   "false",  
-  "bool", 
+  "Bool", 
+  "Int", 
+  "Real",  
+  "Char",  
+  "String",  
 
 # available functions
   "select",
@@ -123,9 +127,7 @@ message incorrectCharEnd : "char does not end with '\''"
 
 rule ''' { 
   select
-  case ' ' | '!' | '#'-> '\uFFFD' :
-    #enterCharacterIntoString (!?tokenString !*) 
-    #letter = [tokenString  !1]
+  case ' ' | '!' | '#'-> '\uFFFD' : 
     enterCharacterIntoCharacter(!?letter !*)
   default
 

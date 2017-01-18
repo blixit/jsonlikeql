@@ -8,31 +8,38 @@
 #------------------------------------------------------------
 
 syntax extension jsonlikeql_syntax {
-
-rule <primitive_name> ?!@type typename {
-	select
-		$Bool$ 
-		@bool n = .default
-		typename =  [n dynamicType]
-	or
-		$Int$ 
-		@uint n = .default
-		typename =  [n dynamicType]
-	or
-		$Real$ 
-		@double n = .default
-		typename =  [n dynamicType] 
-	or
-		$Char$ 
-		@char n = .default
-		typename =  [n dynamicType] 
-	or
-		$String$  
-		@string n = .default
-		typename =  [n dynamicType]
-	end
+	
+rule <class> {
+	$identifier$ ?* ${$
+		repeat
+			<class_property>
+		while
+		$,$
+		end
+	$}$
 }
 
+rule <class_property> {
+
+	$identifier$ ?* $:$
+
+	@type propertyType = @type.default
+	<class_property_type> !? propertyType
+}
+
+rule <class_property_type> ?!@type propertyType{
+	
+	select 
+		<primitive_name> !? propertyType
+	or
+		$identifier$ ?*
+
+		# on cherche le type dans la table des classes enregistrées
+
+		propertyType = @type.default
+	end
+}
+	
 }
 
 #------------------------------------------------------------

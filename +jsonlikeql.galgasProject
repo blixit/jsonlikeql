@@ -22,5 +22,7 @@ project (0:0:1) -> "jsonlikeql" {
   "galgas-sources/jsonlikeql-program.galgas"
 
   "galgas-sources/types-primitives-syntax.galgas"
+  "galgas-sources/types-lvalue-syntax.galgas"
+  "galgas-sources/class-syntax.galgas"
 }
 

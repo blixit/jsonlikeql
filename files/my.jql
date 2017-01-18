@@ -1,6 +1,18 @@
-55_.5 2_5_5_6___5.2_____
-25
-0. 1561566 232.23253333 true false
-'r'
-' '
-"a string"
+types
+
+Montype{
+	id:Bool,
+	id:Int,
+	id:Real,
+	id:Char,
+	id:String,
+	id:Montype2
+}
+Montype2{
+	id:Bool,
+	id:Int,
+	id:Real,
+	id:Char,
+	id:String,
+	id:Montype2
+}
