@@ -1,12 +1,25 @@
 syntax jsonlikeql_syntax (jsonlikeql_lexique) {
 
 rule <start_symbol> {
-	$types$
-	
+
+	@ClassMap classMap = {};
+	@CandidateClassMap candidateClassMap = {};
+
+	# Class du système
+	@Class c = .new{!@lstring.new{!"____Application" !@location.here} !{}}
+	[!?classMap insertKey ![c name] !c]
+
+	$types$	
 	repeat
 	while
-		<class>
-	end
+		@Class aclass = .default
+		<class> !? aclass !? candidateClassMap  
+	
+		[!?classMap insertKey ![aclass name] !aclass]
+	end  
+
+	checkCandidateClass(!candidateClassMap !classMap)
+ 	log classMap
 
 	$functions$ ${$ 	
 	repeat
@@ -24,4 +37,23 @@ rule <start_symbol> {
 }
 
 
+}
+
+# this function checks if all the candidate class have been declared
+proc checkCandidateClass
+	?@CandidateClassMap candidateClassMap
+	?@ClassMap classMap 
+	{
+
+	for () in candidateClassMap	do 
+		@lstring candidate = lkey 
+ 
+		if( [[candidate string] length] > 0) then
+			# on supprime la clé de la liste des clés candidates
+			[!?candidateClassMap removeKey !candidate ] 	
+ 			
+ 			# on vérifie que la clé candidate est une classe définie
+			[classMap searchKey !candidate ?* ] 
+		end
+	end 
 }

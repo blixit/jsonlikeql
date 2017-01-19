@@ -1,20 +1,21 @@
 types
 
 Montype{
-	id:[Bool],
+	bool:[Bool],
 	id:Int,
-	id:Real,
-	id:Char,
-	id:String,
-	id:Montype2
+	reel:Real,
+	char:Char,
+	string:String,
+	montype:Montype2
 }
 Montype2{
-	id:Bool,
-	id:Int,
-	id:Real,
-	id:Char,
-	id:String,
-	id:[Montype2]
+	id:Bool, 
+	montype:[Montype2]
+}
+Montype3{
+	id:Bool, 
+	montype:[Montype2],
+	coucou:String
 }
 
 functions {

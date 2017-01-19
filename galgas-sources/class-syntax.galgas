@@ -3,53 +3,128 @@
 #	S E M A N T I Q U E   -   C L A S S
 #------------------------------------------------------------
 
+# Definition d'une classe
+
+class @Class{
+	@lstring name
+	@PropertiesMap properties
+}
+
+map @ClassMap{
+	@Class mClass
+	insert insertKey error message "the '%K' class has been already declared"
+	search searchKey error message "the '%K' class is not declared"
+}
+
+# a candidate class is a class used before its implementation
+# when a candidate class is met into the code (while defining a class properties), its name is stored into this map. 
+# After the classes declaration, all candidates classes are checked
+map @CandidateClassMap{ 
+	insert insertKey error message "the '%K' candidate class has been already declared"
+	search searchKey error message "the '%K' candidate class is not declared"
+	remove removeKey error message "the '%K' candidate class is not declared and can't be removed"
+}
+
+# Definition des propriétés
+
+class @Propertie{
+	@lstring name
+	@lstring typeName 
+}
+
+map @PropertiesMap{
+	@lstring typeName
+	insert insertKey error message "the '%K' property has been already declared"
+	search searchKey error message "the '%K' property is not declared"
+}  
+
+
 #------------------------------------------------------------
 #	S Y N T A X
 #------------------------------------------------------------
 
 syntax extension jsonlikeql_syntax {
-	
-rule <class> {
-	$identifier$ ?* ${$
+
+rule <class> 
+	?! @Class aclass  # un objet de type class pour récupérer la classe définie
+	?! @CandidateClassMap candidateClassMap  # pour stocker les types candidats
+	{
+
+	$identifier$ ?let @lstring className
+	aclass = @Class.new{!className !{}} 
+
+	${$
+		@PropertiesMap localProperties = {}
 		repeat
-			<class_property>
+			@Propertie property = .default
+			<class_property> !? property !?candidateClassMap
+			#log property
+			[!?localProperties insertKey ![property name] ![property typeName]] 
 		while
 		$,$
 		end
 	$}$
+
+	aclass = .new{!className !localProperties}
 }
 
-rule <class_property> {
+rule <class_property> 
+	?!@Propertie property #liste des propriétés ren
+	?!@CandidateClassMap candidateClassMap  # pour stocker les types candidats
+	{
 
-	$identifier$ ?* $:$
+	$identifier$ ?let @lstring name $:$ 
  
 	@lstring typeName = .default
-	<class_property_type> !? typeName
+	<class_property_type> !? typeName !? candidateClassMap
+
+	property = @Propertie.new{!name !typeName}
 }
 
-rule <class_property_type> ?!@lstring typeName{
+rule <class_property_type> 
+	?!@lstring typeName
+	?!@CandidateClassMap candidateClassMap  # pour stocker les types candidats
+	{
 	
-	#@lstring typeNameTmp = .default
+	@lstring className = .default
+	@bool isArray = false
+	@bool isAClass = false
+
 	select 
 		select 
 			<primitive_name> !? typeName
 		or 
 			$identifier$ ?let @lstring name
-
+			className = name
+			isAClass = true
 		end		
 	or	
+		isArray = true
 		$[$ 	
 		select 
 			<primitive_name> !? typeName $]$
-			#typeNameTmp = name
+			typeName.string = "*" + typeName.string
 		or 
 			$identifier$ ?let @lstring name $]$
-			#typeNameTmp = name
+			className = name
+			isAClass = true
 		end				
 	end
-	# on cherche le type dans la table des classes enregistrées 
+	# on cherche le type dans la table des classes enregistrées  
+	if (isAClass == true ) then 
+		with [className string] in !?candidateClassMap
+		do
+			#existe   
+		else
+			# si la classe candidate n''existe pas, on la rajoute  
+			[!?candidateClassMap insertKey !className ] 		
+		end	 
 
-	#typeName = typeNameTmp
+		if (isArray == true ) then 
+			className.string = "*" + className.string
+		end
+		typeName = className
+	end	 
 }
 	
 }
