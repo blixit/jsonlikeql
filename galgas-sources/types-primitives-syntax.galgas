@@ -9,27 +9,22 @@
 
 syntax extension jsonlikeql_syntax {
 
-rule <primitive_name> ?!@type typename {
+rule <primitive_name> ?!@lstring typename {
 	select
-		$Bool$ 
-		@bool n = .default
-		typename =  [n dynamicType]
+		$Bool$  
+		typename =  .new{!"bool" !@location.here}
 	or
 		$Int$ 
-		@uint n = .default
-		typename =  [n dynamicType]
+		typename =  .new{!"Int" !@location.here}
 	or
 		$Real$ 
-		@double n = .default
-		typename =  [n dynamicType] 
+		typename =  .new{!"Real" !@location.here}
 	or
 		$Char$ 
-		@char n = .default
-		typename =  [n dynamicType] 
+		typename =  .new{!"Char" !@location.here}
 	or
 		$String$  
-		@string n = .default
-		typename =  [n dynamicType]
+		typename =  .new{!"String" !@location.here}
 	end
 }
 

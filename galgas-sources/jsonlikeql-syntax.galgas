@@ -7,6 +7,13 @@ rule <start_symbol> {
 	while
 		<class>
 	end
+
+	$functions$ ${$ 	
+	repeat
+	while
+		<function_container>
+	end
+	$}$
 }
 
 

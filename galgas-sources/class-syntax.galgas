@@ -22,21 +22,21 @@ rule <class> {
 rule <class_property> {
 
 	$identifier$ ?* $:$
-
-	@type propertyType = @type.default
-	<class_property_type> !? propertyType
+ 
+	@lstring typeName = .default
+	<class_property_type> !? typeName
 }
 
-rule <class_property_type> ?!@type propertyType{
+rule <class_property_type> ?!@lstring typeName{
 	
 	select 
-		<primitive_name> !? propertyType
+		<primitive_name> !? typeName
 	or
-		$identifier$ ?*
+		$identifier$ ?let @lstring name
 
-		# on cherche le type dans la table des classes enregistrées
+		# on cherche le type dans la table des classes enregistrées 
 
-		propertyType = @type.default
+		typeName = name
 	end
 }
 	

@@ -16,3 +16,17 @@ Montype2{
 	id:String,
 	id:Montype2
 }
+
+functions {
+	: 
+	test({jk:5, kl:"re", array:[]}) -> Montype 
+	:aire -> Montype2
+	+ 
+		ajouterUser()->[User]
+	-
+	:
+		test
+	!
+}
+
+ 

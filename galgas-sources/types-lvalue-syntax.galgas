@@ -37,6 +37,66 @@ rule <bool_definition> ?!@lbool b{
 	end
 }
 
+rule <object_definition> { #?!@MemberList members {
+	#un objet  
+
+	${$ 
+		select or		
+			repeat
+				#@LValue lvalue = @LValue.default;
+
+				$identifier$ ?let @lstring key $:$ <value_definition> #!?lvalue 
+
+				#members += !@Member.new{!key.string !lvalue}
+			while
+			$,$
+			end
+		end
+	$}$ 
+}
+
+rule <value_definition> { #?!@LValue lvalue {
+	select
+		$integer$ ?let @luint value
+		#lvalue = @IntegerLV.new{!@location.here !value.uint} 
+	or
+		$real$ ?let @ldouble value
+		#lvalue = @IntegerLV.new{!@location.here !value.uint} 
+	or
+		$'char'$ ?let @lchar value
+		#lvalue = ...
+	or
+		$"string"$ ?let @lstring value
+		#lvalue = @StringLV.new{!@location.here !value.string} 
+	#or 
+		#@lbool value = .default
+		#<bool_definition> !? value 
+		#lvalue = @BoolLV.new{!@location.here !value.bool}
+	or 
+		#@LValueList items = {};
+		<array_definition> # !?items
+		#lvalue = @ArrayLV.new{!@location.here !items} 
+	or
+		#@MemberList members = {};
+		<object_definition> #!?members
+		#lvalue = @ObjectLV.new{!@location.here !members} 
+	end
+}
+
+rule <array_definition> { #?!@LValueList items {
+	$[$
+	select or  
+		repeat
+			#@LValue lvalue = @LValue.default;
+			<value_definition> #!? lvalue 
+			#items += !lvalue;
+		while
+		$,$
+		end
+	end
+	$]$
+}
+
 }
 
 #------------------------------------------------------------

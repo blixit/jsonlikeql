@@ -1,0 +1,63 @@
+
+#------------------------------------------------------------
+#	S E M A N T I Q U E   -   C L A S S
+#------------------------------------------------------------
+
+#------------------------------------------------------------
+#	S Y N T A X
+#------------------------------------------------------------
+
+syntax extension jsonlikeql_syntax {
+	
+rule <function_container> {  
+	select		$:$	or		$+$	or		$!$	or		$-$	end
+ 
+	repeat
+	while
+		<function>  
+	end
+}
+
+rule <function>  {
+	$identifier$ ?let @lstring nom
+	log nom
+
+	select or
+	<function_parameters>
+	end
+ 
+	<function_returnedType> 
+}
+
+rule <function_parameters> { 
+	$($
+		select or 
+		<object_definition>
+		end
+	$)$ 
+}
+
+
+
+rule <function_returnedType> {
+	select 
+
+	or
+		$->$ 
+		select  
+			$identifier$ ?let @lstring rtn
+			#returnTypeName = rtn;
+		or
+			$[$	$identifier$ ?let @lstring typestr	$]$ 
+			#returnTypeName.string = "*" + typestr.string ;
+		end
+	end
+}
+ 
+	
+}
+
+#------------------------------------------------------------
+#	S E M A N T I Q U E   -   F U N C T I O N S
+#------------------------------------------------------------
+ 
