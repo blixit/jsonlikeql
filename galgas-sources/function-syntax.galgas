@@ -37,8 +37,6 @@ rule <function_parameters> {
 	$)$ 
 }
 
-
-
 rule <function_returnedType> {
 	select 
 

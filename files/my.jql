@@ -1,7 +1,7 @@
 types
 
 Montype{
-	id:Bool,
+	id:[Bool],
 	id:Int,
 	id:Real,
 	id:Char,
@@ -14,7 +14,7 @@ Montype2{
 	id:Real,
 	id:Char,
 	id:String,
-	id:Montype2
+	id:[Montype2]
 }
 
 functions {
@@ -26,6 +26,7 @@ functions {
 	-
 	:
 		test
+		Logements	
 	!
 }
 

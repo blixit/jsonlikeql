@@ -29,15 +29,27 @@ rule <class_property> {
 
 rule <class_property_type> ?!@lstring typeName{
 	
+	#@lstring typeNameTmp = .default
 	select 
-		<primitive_name> !? typeName
-	or
-		$identifier$ ?let @lstring name
+		select 
+			<primitive_name> !? typeName
+		or 
+			$identifier$ ?let @lstring name
 
-		# on cherche le type dans la table des classes enregistrées 
-
-		typeName = name
+		end		
+	or	
+		$[$ 	
+		select 
+			<primitive_name> !? typeName $]$
+			#typeNameTmp = name
+		or 
+			$identifier$ ?let @lstring name $]$
+			#typeNameTmp = name
+		end				
 	end
+	# on cherche le type dans la table des classes enregistrées 
+
+	#typeName = typeNameTmp
 }
 	
 }
