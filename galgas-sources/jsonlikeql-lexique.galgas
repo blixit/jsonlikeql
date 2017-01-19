@@ -24,13 +24,7 @@ list keyWordList style keywordsStyle error message "the '%K' keyword" {
   "Int", 
   "Real",  
   "Char",  
-  "String",  
-
-# available functions
-  "select",
-  "insert",
-  "update",
-  "delete",
+  "String", 
 
 # queries features
   "propagate",

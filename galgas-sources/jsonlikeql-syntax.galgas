@@ -5,7 +5,9 @@ rule <start_symbol> {
 	@ClassMap classMap = {};
 	@CandidateClassMap candidateClassMap = {};
 
-	@FunctionsMap functionsList = {};
+	@FunctionsMap functionsMap = {};
+
+	@QueryMap queryMap = {};
 
 	# Class du système
 
@@ -26,16 +28,17 @@ rule <start_symbol> {
 	$functions$ ${$ 	
 	repeat
 	while 
-		<functions_container> !? functionsList  
+		<functions_container> !? functionsMap 
 	end
 	$}$ 
 
 	$queries$ ${$ 	
 	repeat
 	while
-		<queries_container>
+		<queries_container> !? queryMap
 	end
 	$}$
+	#log queryMap
 }
 
 

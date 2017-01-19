@@ -3,25 +3,77 @@
 #	S E M A N T I Q U E   -   C L A S S
 #------------------------------------------------------------
 
+# Eénumération des propagations possibles
+enum @Propagation{ 
+	case default_
+	case full_
+}
+
+#Définition d'une requete
+class @Query{
+	@lstring name
+	@lchar queryType  
+	@ObjectLV parameters
+}
+
+class @SelectQuery : @Query{
+	@QueryMap fields
+	@Propagation propagation
+}
+class @MutateQuery : @Query{
+	@FieldsMap fields 
+}
+
+map @QueryMap{
+	@Query query
+	insert insertKey error message "the '%K' query has been already declared"
+	search searchKey error message "the '%K' query is not declared"
+}
+
+map @FieldsMap{
+	@LValue lvalue
+	insert insertKey error message "the '%K' field has been already declared"
+	search searchKey error message "the '%K' field is not declared"
+}
+
 #------------------------------------------------------------
 #	S Y N T A X
 #------------------------------------------------------------
 
 syntax extension jsonlikeql_syntax {
 
-rule <queries_container> {  
-	select		$:$	or		$+$	or		$!$	or		$-$	end
+rule <queries_container> 
+	?! @QueryMap queryMap
+	{  
+
+	@lchar queryType = .default;
+	select $:$ queryType.char = ':'	
+	or	$+$	queryType.char = '+'	
+	or	$!$	queryType.char = '!'	
+	or	$-$	queryType.char = '-'	
+	end 
  
- 	<query>
+ 	@Query query = .default;
+
+ 	<query> ! queryType !? query
+
+ 	@lstring key = @lstring.new{![[queryMap count] string] !@location.here}; 
+ 	[!? queryMap insertKey !key !query] 
 
 	repeat
 	while
-		<query> 
+		query = @Query.default;
+		<query> ! queryType !? query
+		key = @lstring.new{![[queryMap count] string] !@location.here}; 
+ 		[!? queryMap insertKey !key !query] 
 	end
 }
 
-rule <query> { 
-	$identifier$ ?let @lstring nom 
+rule <query> 
+	? @lchar queryType
+	?! @Query query
+	{ 
+	$identifier$ ?let @lstring name 
 
 	# détection des paramètres
 
@@ -32,37 +84,61 @@ rule <query> {
 
 	# détection de la propagation : seulement pour les fonctions de type select
 
+	@Propagation propagation = @Propagation.default_;
 	select or
-	<propagation>
+	<propagation> !? propagation
 	end
 
 	# détection des champs de la requete
 
+	@QueryMap fieldsQ = .default;
+	@FieldsMap fieldsF = .default;
+
 	select or
-		<fields>
+		<fields> !queryType !?fieldsQ !?fieldsF
 	end
- 
+
+	if( [queryType char] == ':' ) then
+		query = @SelectQuery.new{ !name !@lchar.new{!queryType !@location.here}  !parameters !fieldsQ !propagation }
+	else
+		query = @MutateQuery.new{ !name !@lchar.new{!queryType !@location.here}  !parameters !fieldsF } 
+ 	end
 }
 
-rule <propagation> {
+rule <propagation> 
+	?! @Propagation propagation
+	{
+
 	$propagate$ 
 	select 
 		$default$
-		#@string l = "propagate default"
-		#log l
+		propagation = @Propagation.default_
 	or
 		$full$
-		#@string l = "propagate full"
-		#log l 
+		propagation = @Propagation.full_
 	end	
 }
 
-rule <fields> {
+rule <fields> 
+	? @lchar queryType
+	?! @QueryMap fieldsQ
+	?! @FieldsMap fieldsF
+	{
 	
 	${$ 
 	select or
 		repeat
-		<field>
+			@Query query = @Query.default;
+			@LValue lvalue = .default;
+			<field> !queryType !?query !?lvalue
+
+			if( [[[query name] string] length] > 0 ) then 
+				if( [queryType char] == ':' ) then 
+		 			[!? fieldsQ insertKey ![query name] !query]
+		 		else 
+		 			[!? fieldsF insertKey ![query name] !lvalue]
+		 		end
+	 		end
 		while
 		$,$
 		end
@@ -70,30 +146,47 @@ rule <fields> {
 	$}$ 
 }
 
-rule <field> {
-	$identifier$ ?*
+rule <field> 
+	? @lchar queryType
+	?! @Query query
+	?! @LValue lvalue
+	{
+	$identifier$ ?let @lstring name
+
+	@ObjectLV parameters = .default;
 
 	select 
 
 	or	 
 		select 								# mutate queries 
-			@LValue lvalue = @LValue.default;
+			@FieldsMap fields = .default; 
+
+			#@LValue lvalue = @LValue.default;
 			$=$ <value_definition> !? lvalue
+			query = @MutateQuery.new{ !name !@lchar.new{!queryType !@location.here}  !parameters !fields }
 		or 									# select queries 
 			# détection des paramètres
 
-			select or
-				@ObjectLV parameters = .default;
+			select or				
 				<function_parameters> !?parameters
 			end 
 
 			# détection de la propagation : seulement pour les fonctions de type select
+			@Propagation propagation = @Propagation.default_;
 
 			select or
-				<propagation>
+				<propagation> !? propagation
 			end
 
-			<fields> 
+			@QueryMap fieldsQ = .default;
+			@FieldsMap fieldsF = .default;
+			<fields> !queryType !?fieldsQ !?fieldsF
+ 
+			if( [queryType char] == ':' ) then
+				query = @SelectQuery.new{ !name !@lchar.new{!queryType !@location.here}  !parameters !fieldsQ !propagation }
+			else
+				query = @MutateQuery.new{ !name !@lchar.new{!queryType !@location.here}  !parameters !fieldsF }
+		 	end
 		end
 	end
 
