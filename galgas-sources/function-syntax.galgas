@@ -3,54 +3,94 @@
 #	S E M A N T I Q U E   -   C L A S S
 #------------------------------------------------------------
 
+# Définition d'une fonction 
+
+class @Function{
+	@lstring name
+	@lchar queryType  
+	@ObjectLV parameters 
+	@lstring returnedType 
+}
+
+map @FunctionsMap{
+	@Function function 
+	insert insertKey error message "the '%K' function has been already declared"
+	search searchKey error message "the '%K' function is not declared"
+}
+
 #------------------------------------------------------------
 #	S Y N T A X
 #------------------------------------------------------------
 
 syntax extension jsonlikeql_syntax {
 	
-rule <functions_container> {  
-	select		$:$	or		$+$	or		$!$	or		$-$	end
- 
- 	 
-	<function>
+rule <functions_container>
+	?! @FunctionsMap functionList
+ 	{  
+	
+	@lchar query = .default;
+	select $:$ query.char = ':'	
+	or	$+$	query.char = '+'	
+	or	$!$	query.char = '!'	
+	or	$-$	query.char = '-'	
+	end 
+ 	
+
+	@Function function = .default;
+	<function> !query !? function
+	[!?functionList insertKey ![function name] !function]
 	
 	repeat
 	while
-		<function>  
+		function = .default;
+		<function> !query !? function
+		[!?functionList insertKey ![function name] !function]
 	end
 	
 }
 
-rule <function>  {
-	$identifier$ ?let @lstring nom 
+rule <function>  
+	? @lchar query
+	?! @Function function 
+	{
+	$identifier$ ?let @lstring name 
 	
+	@ObjectLV parameters = .default;
 	select or
-	<function_parameters>
+	<function_parameters> !?parameters
 	end
  
-	<function_returnedType> 
+ 	@lstring returnedType = .default;
+	<function_returnedType> !? returnedType
+
+	function = .new{ !name !@lchar.new{!query !@location.here}  !parameters !returnedType  }
 }
 
-rule <function_parameters> { 
+rule <function_parameters>
+	?! @ObjectLV parameters
+	{ 
+	@MemberList members = {};
 	$($
-		select or 
-		<object_definition>
+		select or 		
+		<object_definition> !? members 
 		end
 	$)$ 
+	parameters = .new{!@location.here !members};
 }
 
-rule <function_returnedType> {
+rule <function_returnedType> 
+	?! @lstring returnedType
+	{
 	select 
 
 	or
 		$->$ 
 		select  
 			$identifier$ ?let @lstring rtn
-			#returnTypeName = rtn;
+			returnedType = rtn;
 		or
 			$[$	$identifier$ ?let @lstring typestr	$]$ 
-			#returnTypeName.string = "*" + typestr.string ;
+			returnedType.string = "*" + typestr.string ;
 		end
 	end
 }

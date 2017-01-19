@@ -5,7 +5,10 @@ rule <start_symbol> {
 	@ClassMap classMap = {};
 	@CandidateClassMap candidateClassMap = {};
 
+	@FunctionsMap functionsList = {};
+
 	# Class du système
+
 	@Class c = .new{!@lstring.new{!"____Application" !@location.here} !{}}
 	[!?classMap insertKey ![c name] !c]
 
@@ -18,15 +21,14 @@ rule <start_symbol> {
 		[!?classMap insertKey ![aclass name] !aclass]
 	end  
 
-	checkCandidateClass(!candidateClassMap !classMap)
- 	log classMap
+	checkCandidateClass(!candidateClassMap !classMap) 
 
 	$functions$ ${$ 	
 	repeat
-	while
-		<functions_container>
+	while 
+		<functions_container> !? functionsList  
 	end
-	$}$
+	$}$ 
 
 	$queries$ ${$ 	
 	repeat

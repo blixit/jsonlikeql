@@ -3,6 +3,85 @@
 #	S E M A N T I Q U E   -   C L A S S
 #------------------------------------------------------------
 
+
+# 	L V A L U E
+# ------------------------------------------------------------
+
+class @LValue{
+	@location here;
+}
+	method @LValue getArray
+		?!@LValueList value
+		{}
+	method @LValue getInteger
+		?!@uint value
+		{}
+	method @LValue getDouble
+		?!@double value
+		{}
+	method @LValue getString
+		?!@string value
+		{}
+	method @LValue getChar
+		?!@char value
+		{}
+	method @LValue getBool
+		?!@bool value
+		{}
+
+class @IntegerLV : @LValue{
+	@uint mLvalue;
+}
+	override method @IntegerLV getInteger
+		?!@uint value
+		{value = mLvalue}
+class @DoubleLV : @LValue{
+	@double mLvalue;
+}
+	override method @DoubleLV getDouble
+		?!@double value
+		{value = mLvalue}
+class @CharLV : @LValue{
+	@char mLvalue;
+}
+	override method @CharLV getChar
+		?!@char value
+		{value = mLvalue}
+class @StringLV : @LValue{
+	@string mLvalue;
+}
+	override method @StringLV getString
+		?!@string value
+		{value = mLvalue}
+class @BoolLV : @LValue{
+	@bool mLvalue;
+}
+	override method @BoolLV getBool
+		?!@bool value
+		{value = mLvalue}
+class @ObjectLV : @LValue{	
+	@MemberList mLvalue;
+}
+class @ArrayLV : @LValue{	
+	@LValueList mLvalue;
+} 
+	override method @ArrayLV getArray
+		?!@LValueList value
+		{value = mLvalue}
+
+class @Member{
+	@string mKey;
+	@LValue mValue;
+}
+
+list @MemberList {
+	@Member mMember;
+}
+
+list @LValueList {
+	@LValue mItem;
+}
+
 #------------------------------------------------------------
 #	S Y N T A X
 #------------------------------------------------------------
@@ -37,17 +116,18 @@ rule <bool_definition> ?!@lbool b{
 	end
 }
 
-rule <object_definition> { #?!@MemberList members {
-	#un objet  
+rule <object_definition> 
+	?!@MemberList members 
+	{ 
 
 	${$ 
 		select or		
 			repeat
-				#@LValue lvalue = @LValue.default;
+				@LValue lvalue = @LValue.default;
 
-				$identifier$ ?let @lstring key $:$ <value_definition> #!?lvalue 
+				$identifier$ ?let @lstring key $:$ <value_definition> !?lvalue 
 
-				#members += !@Member.new{!key.string !lvalue}
+				members += !@Member.new{!key.string !lvalue}
 			while
 			$,$
 			end
@@ -55,41 +135,47 @@ rule <object_definition> { #?!@MemberList members {
 	$}$ 
 }
 
-rule <value_definition> { #?!@LValue lvalue {
+rule <value_definition> 
+	?!@LValue lvalue 
+	{
+
 	select
 		$integer$ ?let @luint value
-		#lvalue = @IntegerLV.new{!@location.here !value.uint} 
+		lvalue = @IntegerLV.new{!@location.here !value.uint} 
 	or
 		$real$ ?let @ldouble value
-		#lvalue = @IntegerLV.new{!@location.here !value.uint} 
+		lvalue = @DoubleLV.new{!@location.here !value.double} 
 	or
 		$'char'$ ?let @lchar value
-		#lvalue = ...
+		lvalue = @CharLV.new{!@location.here !value.char}
 	or
 		$"string"$ ?let @lstring value
-		#lvalue = @StringLV.new{!@location.here !value.string} 
-	#or 
-		#@lbool value = .default
-		#<bool_definition> !? value 
-		#lvalue = @BoolLV.new{!@location.here !value.bool}
+		lvalue = @StringLV.new{!@location.here !value.string} 
 	or 
-		#@LValueList items = {};
-		<array_definition> # !?items
-		#lvalue = @ArrayLV.new{!@location.here !items} 
+		@lbool value = .default
+		<bool_definition> !? value 
+		lvalue = @BoolLV.new{!@location.here !value.bool}
+	or 
+		@LValueList items = {};
+		<array_definition>  !?items
+		lvalue = @ArrayLV.new{!@location.here !items} 
 	or
-		#@MemberList members = {};
-		<object_definition> #!?members
-		#lvalue = @ObjectLV.new{!@location.here !members} 
+		@MemberList members = {};
+		<object_definition> !?members
+		lvalue = @ObjectLV.new{!@location.here !members} 
 	end
 }
 
-rule <array_definition> { #?!@LValueList items {
+rule <array_definition> 
+	?!@LValueList items 
+	{
+
 	$[$
 	select or  
 		repeat
-			#@LValue lvalue = @LValue.default;
-			<value_definition> #!? lvalue 
-			#items += !lvalue;
+			@LValue lvalue = @LValue.default;
+			<value_definition> !? lvalue 
+			items += !lvalue;
 		while
 		$,$
 		end

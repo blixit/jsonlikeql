@@ -1,3 +1,6 @@
+/*
+	Author Blixit
+*/
 types
 
 Montype{
@@ -20,22 +23,19 @@ Montype3{
 
 functions {
 	:
-		test({jk:5, kl:"re", array:[]}) -> Montype 
+		test({if:["id > 5 AND name = 'coucou' "]}) -> Montype 
 	:
 		aire -> Montype2
 	+ 
 		ajouterUser()->[User]
 	-
-		oiio
+		deleteUsers
 	:
-		test
-		Logements	
+		getLogements	
 	!
-		jk
+		update({if:[""]})
 }
-/* 
-	ici je mets mes requetes
-*/
+
 queries {
 	:
 		test({jk:5, kl:"re", array:[]}) propagate default
@@ -64,6 +64,3 @@ queries {
 	!
 		lm
 }
-/*
-	Ici je mets n'importe quoi qui sera ignoré
-*/

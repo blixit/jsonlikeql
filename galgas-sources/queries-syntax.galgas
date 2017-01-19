@@ -25,8 +25,9 @@ rule <query> {
 
 	# détection des paramètres
 
+	@ObjectLV parameters = .default;
 	select or
-	<function_parameters>
+	<function_parameters> !? parameters
 	end 
 
 	# détection de la propagation : seulement pour les fonctions de type select
@@ -76,12 +77,14 @@ rule <field> {
 
 	or	 
 		select 								# mutate queries 
-			$=$ <value_definition>
+			@LValue lvalue = @LValue.default;
+			$=$ <value_definition> !? lvalue
 		or 									# select queries 
 			# détection des paramètres
 
 			select or
-				<function_parameters>
+				@ObjectLV parameters = .default;
+				<function_parameters> !?parameters
 			end 
 
 			# détection de la propagation : seulement pour les fonctions de type select
