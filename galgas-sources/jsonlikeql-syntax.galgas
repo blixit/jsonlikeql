@@ -11,7 +11,14 @@ rule <start_symbol> {
 	$functions$ ${$ 	
 	repeat
 	while
-		<function_container>
+		<functions_container>
+	end
+	$}$
+
+	$queries$ ${$ 	
+	repeat
+	while
+		<queries_container>
 	end
 	$}$
 }

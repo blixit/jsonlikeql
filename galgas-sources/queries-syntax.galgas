@@ -1,0 +1,105 @@
+
+#------------------------------------------------------------
+#	S E M A N T I Q U E   -   C L A S S
+#------------------------------------------------------------
+
+#------------------------------------------------------------
+#	S Y N T A X
+#------------------------------------------------------------
+
+syntax extension jsonlikeql_syntax {
+
+rule <queries_container> {  
+	select		$:$	or		$+$	or		$!$	or		$-$	end
+ 
+ 	<query>
+
+	repeat
+	while
+		<query> 
+	end
+}
+
+rule <query> { 
+	$identifier$ ?let @lstring nom 
+
+	# détection des paramètres
+
+	select or
+	<function_parameters>
+	end 
+
+	# détection de la propagation : seulement pour les fonctions de type select
+
+	select or
+	<propagation>
+	end
+
+	# détection des champs de la requete
+
+	select or
+		<fields>
+	end
+ 
+}
+
+rule <propagation> {
+	$propagate$ 
+	select 
+		$default$
+		@string l = "propagate default"
+		log l
+	or
+		$full$
+		@string l = "propagate full"
+		log l 
+	end	
+}
+
+rule <fields> {
+	
+	${$ 
+	select or
+		repeat
+		<field>
+		while
+		$,$
+		end
+	end
+	$}$ 
+}
+
+rule <field> {
+	$identifier$ ?*
+
+	select 
+
+	or	 
+		select 								# mutate queries 
+			$=$ <value_definition>
+		or 									# select queries 
+			# détection des paramètres
+
+			select or
+				<function_parameters>
+			end 
+
+			# détection de la propagation : seulement pour les fonctions de type select
+
+			select or
+				<propagation>
+			end
+
+			<fields> 
+		end
+	end
+
+}
+	
+ 
+
+}
+
+#------------------------------------------------------------
+#	S E M A N T I Q U E   -   F U N C T I O N S
+#------------------------------------------------------------

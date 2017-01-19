@@ -9,13 +9,17 @@
 
 syntax extension jsonlikeql_syntax {
 	
-rule <function_container> {  
+rule <functions_container> {  
 	select		$:$	or		$+$	or		$!$	or		$-$	end
  
+ 	 
+	<function>
+	
 	repeat
 	while
 		<function>  
 	end
+	
 }
 
 rule <function>  {

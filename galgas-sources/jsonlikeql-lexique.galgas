@@ -14,7 +14,7 @@ $identifier$ ! tokenString error message "an identifier"
 list keyWordList style keywordsStyle error message "the '%K' keyword" {
   "types",
   "functions",
-  "query",
+  "queries",
 
 # values and types
   "null",
@@ -30,7 +30,12 @@ list keyWordList style keywordsStyle error message "the '%K' keyword" {
   "select",
   "insert",
   "update",
-  "delete"
+  "delete",
+
+# queries features
+  "propagate",
+  "default",
+  "full"
 }
 
 rule 'a'->'z' |  'A'->'Z' {
@@ -146,7 +151,7 @@ rule ''' {
 
 style delimitersStyle -> "Delimiters"
 list delimitorsList style delimitersStyle error message "the '%K' delimitor" {
-  ":", ";", "'",  ",",  "{",  "}",  "(",  ")",  "[",  "]", "->", "+", "!", "-"
+  ":", ";", "'",  ",",  "{",  "}",  "(",  ")",  "[",  "]", "->", "+", "!", "-", "="
 }
 
 rule list delimitorsList
