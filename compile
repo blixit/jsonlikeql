@@ -10,6 +10,8 @@ EXEC=$DIR/makefile-unix/$PROJECT
 LOGFILE=build.log
 LOGGALGAS=galgas.log
 
+MAKEFILEUNIX=1
+
 export PATH=$PATH:$DIR
 
 rm -f $LOGFILE
@@ -27,12 +29,22 @@ fi
 if [ -f $EXEC ]; then
 	echo -e "Deleting old executable ..."
 	rm -f $EXEC*
-	echo -e "done !" 
+	echo -e "Done !" 
 fi
 
 ./makefile-unix/build.py
 
 #run after compiling to accelerate the development
-if [[ -f $DIR/files/my.$EXT && -f ./makefile-unix/$PROJECT ]]; then 
-	./makefile-unix/$PROJECT $DIR/files/my.$EXT
+if [[ MAKEFILEUNIX -eq 1 && -f ./makefile-unix/$PROJECT ]]; then 
+	for file in $DIR/files/* 
+	do 
+		if [[ -f $file ]]; then 
+			echo -e "Testing file " $file " ..."
+			./makefile-unix/$PROJECT $file
+			if [ $? -ne "0" ];	then
+				exit
+			fi
+			echo -e "Done !" $?
+		fi
+	done
 fi

@@ -47,12 +47,12 @@ rule <propagation> {
 	$propagate$ 
 	select 
 		$default$
-		@string l = "propagate default"
-		log l
+		#@string l = "propagate default"
+		#log l
 	or
 		$full$
-		@string l = "propagate full"
-		log l 
+		#@string l = "propagate full"
+		#log l 
 	end	
 }
 

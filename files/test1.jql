@@ -19,25 +19,31 @@ Montype2{
 
 functions {
 	:
-	test({jk:5, kl:"re", array:[]}) -> Montype 
-	:aire -> Montype2
+		test({jk:5, kl:"re", array:[]}) -> Montype 
+	:
+		aire -> Montype2
 	+ 
 		ajouterUser()->[User]
-	-oiio
+	-
+		oiio
 	:
 		test
 		Logements	
-	!jk
+	!
+		jk
 }
- 
+/* 
+	ici je mets mes requetes
+*/
 queries {
 	:
-	test({jk:5, kl:"re", array:[]}) propagate default
-	:aire 
+		test({jk:5, kl:"re", array:[]}) propagate default
+	:
+		aire 
 	+ 
 		ajouterUser() propagate full{ 
 			id = {
-
+				name: 'f'
 			},
 			name = "alain",
 			logement() propagate default{
@@ -49,9 +55,14 @@ queries {
 			age=15
 
 		}
-	-tes
+	-
+		tes
 	:
 		test propagate full
 		Logements	
-	!lm
+	!
+		lm
 }
+/*
+	Ici je mets n'importe quoi qui sera ignoré
+*/

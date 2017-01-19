@@ -151,7 +151,7 @@ rule ''' {
 
 style delimitersStyle -> "Delimiters"
 list delimitorsList style delimitersStyle error message "the '%K' delimitor" {
-  ":", ";", "'",  ",",  "{",  "}",  "(",  ")",  "[",  "]", "->", "+", "!", "-", "="
+  ":", ";", "'",  ",",  "{",  "}",  "(",  ")",  "[",  "]", "->", "+", "!", "-", "="   
 }
 
 rule list delimitorsList
@@ -162,12 +162,41 @@ rule list delimitorsList
 
 style commentStyle -> "Comments"
 $comment$ style commentStyle %nonAtomicSelection error message "a comment"
+
+message badComment : "Bad multi-lines comment found"
+
 rule '#' {
   repeat
   while '\u0001' -> '\u0009' | '\u000B' | '\u000C' | '\u000E' -> '\uFFFD' :
   end
   drop $comment$
 }
+
+rule '/' {
+  select 
+  case '*' : 
+    repeat
+    while '\u0001' -> '\u000C' | '\u000E' -> '\u0029'  | '\u002B' -> '\uFFFD' :
+    end 
+
+    select 
+    case '*':
+      select 
+      case '/':
+      default
+        error badComment
+      end
+    default
+      error badComment
+    end 
+    
+  default
+    error badComment
+  end
+
+  drop $comment$   
+}
+
 
 #----------------------------------------------------------------------------------------------------------------------*
 #   Separators                                                                                                         *

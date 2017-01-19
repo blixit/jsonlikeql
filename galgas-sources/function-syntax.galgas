@@ -23,9 +23,8 @@ rule <functions_container> {
 }
 
 rule <function>  {
-	$identifier$ ?let @lstring nom
-	log nom
-
+	$identifier$ ?let @lstring nom 
+	
 	select or
 	<function_parameters>
 	end
