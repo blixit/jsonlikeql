@@ -1,3 +1,19 @@
+#------------------------------------------------------------
+#	E R R O R S
+#
+#	Since Galgas doesn't provide any tool to manage exceptions, we use the system below to catch 
+# 	semantic errors. 
+#------------------------------------------------------------
 
-# ADD YOUR CODE
+map @LocalError{
+	insert insertKey error message "'%K' " 
+}
 
+# @LocalError erreur = {};
+# @string ifArgsRequired = "If-args-required";   # <-- this is the error i want to trigger
+# [!? erreur insertKey !.new{!ifArgsRequired !@location.here}]
+
+# ... my code 
+# if (condition for trigering my error ) then 
+# 	[!? erreur insertKey !.new{!ifArgsRequired !@location.here}]   # <-- i add the same key which generate en error
+# end
