@@ -119,7 +119,7 @@ rule <queries_container>
 #	S E M A N T I Q U E   -   F U N C T I O N S
 #------------------------------------------------------------
 
-method @Query getFinalType
+method @Query getMainTable
 	?! @string table
 	{
 

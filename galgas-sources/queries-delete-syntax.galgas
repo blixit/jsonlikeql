@@ -61,7 +61,7 @@ override method @DeleteQuery toSql
 
 	@string table = ""; 
 
-	[self getFinalType !? table ] 
+	[self getMainTable !? table ] 
 
 	sql += "`" + table + "` " ;
 
