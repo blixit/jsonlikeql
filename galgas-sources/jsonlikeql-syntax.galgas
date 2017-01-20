@@ -36,12 +36,36 @@ rule <start_symbol> {
 	$queries$ ${$ 	
 	repeat
 	while
-		<queries_container> !? queryMap
+		<queries_container> !? queryMap !? functionsMap
 	end
 	$}$ 
+
+	@string queries = @string.default;
+	for () in queryMap do  
+		@string sql = "";
+		[query toSql !? sql]
+		queries += sql;
+
+		#queries += toSql(![requete functionName] ![requete mParameters] ![requete mResponseFields] !listeDesFonctions) 
+	 
+	end
+
+	let @string sourceFilePath = @string.stringWithSourceFilePath
+	let @string code = [filewrapper generationTemplate.sql
+	!queries
+	]
+	[code writeToFile ![sourceFilePath stringByDeletingPathExtension] + ".sql"]
+
 }
 
 
+}
+
+filewrapper generationTemplate in "." {
+}{
+}{
+	template sql "jsonlikeql-sql.galgasTemplate" 
+	?@string queries 
 }
 
 # this function checks if all the candidate class have been declared

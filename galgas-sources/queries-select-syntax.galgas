@@ -15,6 +15,7 @@ syntax extension jsonlikeql_syntax {
 rule <query> 
 	? @lchar queryType
 	?! @Query query
+	?! @FunctionsMap functionsMap
 	{ 
 	$identifier$ ?let @lstring name 
 

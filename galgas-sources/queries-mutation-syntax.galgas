@@ -15,6 +15,7 @@ syntax extension jsonlikeql_syntax {
 rule <queryMutator> 
 	? @lchar queryType
 	?! @Query query
+	?! @FunctionsMap functionsMap
 	{ 
 	$identifier$ ?let @lstring name 
 
@@ -24,6 +25,12 @@ rule <queryMutator>
 	select or
 	<function_parameters> !? parameters
 	end  
+
+	#[listeDesFonctions searchKey !functionName ?function ]
+
+	#if (checkParameters(!parameters !fct_mParameters) == true) then
+
+	#end
 
 	# détection des champs de la requete
 

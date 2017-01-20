@@ -15,16 +15,31 @@ class @Query{
 	@lchar queryType  
 	@ObjectLV parameters
 }
+	method @Query toSql 
+		?!@string sql
+	{ }
+
 
 class @SelectQuery : @Query{
 	@QueryMap fields
 	@Propagation propagation
 }
+	override method @SelectQuery toSql 
+		?!@string sql
+	{ }
+	
 class @MutateQuery : @Query{
 	@FieldsMap fields 
 }
+	override method @MutateQuery toSql 
+		?!@string sql
+	{ }
+
 class @DeleteQuery : @Query{ 
 }
+	override method @DeleteQuery toSql 
+		?!@string sql
+	{ }
 
 map @QueryMap{
 	@Query query
@@ -46,6 +61,7 @@ syntax extension jsonlikeql_syntax {
 
 rule <queries_container> 
 	?! @QueryMap queryMap
+	?! @FunctionsMap functionsMap
 	{  
 
 	@lchar queryType = .default;
@@ -54,7 +70,7 @@ rule <queries_container>
 
 		@Query query = .default;
 
-	 	<query> ! queryType !? query
+	 	<query> ! queryType !? query !? functionsMap
 
 	 	@lstring key = @lstring.new{![[queryMap count] string] !@location.here}; 
 	 	[!? queryMap insertKey !key !query] 
@@ -62,7 +78,7 @@ rule <queries_container>
 		repeat
 		while
 			query = @Query.default;
-			<query> ! queryType !? query
+			<query> ! queryType !? query !? functionsMap
 			key = @lstring.new{![[queryMap count] string] !@location.here}; 
 	 		[!? queryMap insertKey !key !query] 
 		end
@@ -74,7 +90,7 @@ rule <queries_container>
 
 		@Query query = .default;
 
-	 	<queryMutator> ! queryType !? query
+	 	<queryMutator> ! queryType !? query !? functionsMap
 
 	 	@lstring key = @lstring.new{![[queryMap count] string] !@location.here}; 
 	 	[!? queryMap insertKey !key !query] 
@@ -82,7 +98,7 @@ rule <queries_container>
 		repeat
 		while
 			query = @Query.default;
-			<queryMutator> ! queryType !? query
+			<queryMutator> ! queryType !? query !? functionsMap
 			key = @lstring.new{![[queryMap count] string] !@location.here}; 
 	 		[!? queryMap insertKey !key !query] 
 		end
@@ -90,7 +106,7 @@ rule <queries_container>
 		$-$	queryType.char = '-'
 		@Query query = .default;
 
-	 	<queryDelete> ! queryType !? query
+	 	<queryDelete> ! queryType !? query !? functionsMap
 
 	 	@lstring key = @lstring.new{![[queryMap count] string] !@location.here}; 
 	 	[!? queryMap insertKey !key !query] 
@@ -98,7 +114,7 @@ rule <queries_container>
 		repeat
 		while
 			query = @Query.default;
-			<queryDelete> ! queryType !? query
+			<queryDelete> ! queryType !? query !? functionsMap
 			key = @lstring.new{![[queryMap count] string] !@location.here}; 
 	 		[!? queryMap insertKey !key !query] 
 		end
@@ -110,3 +126,4 @@ rule <queries_container>
 #------------------------------------------------------------
 #	S E M A N T I Q U E   -   F U N C T I O N S
 #------------------------------------------------------------
+

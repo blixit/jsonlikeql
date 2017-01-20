@@ -14,6 +14,7 @@ syntax extension jsonlikeql_syntax {
 rule <queryDelete> 
 	? @lchar queryType
 	?! @Query query
+	?! @FunctionsMap functionsMap
 	{ 
 	$identifier$ ?let @lstring name 
 
@@ -23,6 +24,13 @@ rule <queryDelete>
 	select or
 	<function_parameters> !? parameters
 	end  
+
+	#@Function function
+	#[functionsMap searchKey !name ?function ]
+
+	#if (checkParameters(!parameters !fct_mParameters) == true) then
+
+	#end
  
 	query = @DeleteQuery.new{ !name !@lchar.new{!queryType !@location.here}  !parameters  } 
 }
