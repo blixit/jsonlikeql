@@ -42,10 +42,8 @@ rule <query>
 		<fields> !queryType !?fieldsQ !?fieldsF !functionsMap
 	end
 
-	@Function function;
-	[functionsMap searchKey !name ?function]
-
-	@lstring returnedType  =  [function returnedType]
+	@lstring returnedType = .default
+	getFunctionReturnedType( !name !functionsMap !? returnedType);
 
 	query = @SelectQuery.new{ !name !@lchar.new{!queryType !@location.here}  !parameters !returnedType !fieldsQ !propagation }
 }

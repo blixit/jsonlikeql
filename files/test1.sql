@@ -9,3 +9,11 @@ SELECT FROM `fakeTable` VALUES ... ;;
 SELECT FROM `fakeTable` VALUES ... ;;
 /* Requete ajouterUser*/
 INSERT INTO `fakeTable` VALUES (...) ;
+/* Requete funct*/
+INSERT INTO `fakeTable` VALUES (...) ;
+/* Requete tes*/
+DELETE FROM `fakeTable` WHERE name = 'yes'  ;
+/* Requete test*/
+DELETE FROM `fakeTable` ;
+/* Requete lm*/
+UPDATE `fakeTable` SET ... ;

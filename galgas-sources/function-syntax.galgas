@@ -102,3 +102,17 @@ rule <function_returnedType>
 #	S E M A N T I Q U E   -   F U N C T I O N S
 #------------------------------------------------------------
  
+proc getFunctionReturnedType
+	? @lstring functionName
+	? @FunctionsMap functionsMap
+	?! @lstring returnedType
+	{
+
+	with [functionName string] in !?functionsMap 
+	do
+		returnedType  =  [function returnedType]
+	else
+		returnedType.string = ""
+	end
+	log returnedType
+} 
