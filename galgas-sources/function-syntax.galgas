@@ -113,6 +113,5 @@ proc getFunctionReturnedType
 		returnedType  =  [function returnedType]
 	else
 		returnedType.string = ""
-	end
-	log returnedType
+	end 
 } 

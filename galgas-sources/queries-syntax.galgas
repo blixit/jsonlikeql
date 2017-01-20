@@ -119,120 +119,19 @@ rule <queries_container>
 #	S E M A N T I Q U E   -   F U N C T I O N S
 #------------------------------------------------------------
 
-override method @SelectQuery toSql 
-	?!@string sql
-	{ 
-	sql = "";
-	sql += "/* Requete "+name.string +"*/\n"
-	sql += "SELECT FROM ";
-
-	sql += "`fakeTable` " ;
-
-	sql += "VALUES ... ;";
-
-	# les conditions et autres directives sql
-	# ---------------------------------------------------
-
-	@MemberList mlist = [parameters mLvalue]
-
-	#si des paramètres ont été fournis
-	@uint argsCount = [mlist length]
-	if(1==0 && argsCount > 0) then  
-		for member in mlist do 
-			if ( [[member mMember] mKey] == "if" ) then 
-				############@LValue conditions = [[member mMember ] mValue]				 
-				@LValueList conditions = {};
-				[[[member mMember ] mValue] getArray !?conditions]
-				@string conditionsStr = "";
-				@uint nbCond = [conditions length]
-				@uint it = 0;
-				
-				for c in conditions do
-					@string cstr = ""
-					[[c mItem] getString !?cstr] 
-					conditionsStr += cstr+ " "
-					if (it < nbCond -1 ) then 
-						conditionsStr += " "
-					end
-					it++ 
-				end
-				sql += "WHERE "+conditionsStr+" "
-			end
-		end
-		#
-	end
-
-	sql += ";\n";
-}
-
-override method @MutateQuery toSql 
-	?!@string sql
+method @Query getFinalType
+	?! @string table
 	{
-	sql = "";
-	sql += "/* Requete "+name.string +"*/\n"
 
+	table = ""; 
 
-	if ( [queryType char] == '+') then 
-		sql += "INSERT INTO ";
-
-		sql += "`fakeTable` " ;
-
-		sql += "VALUES (...) ";
+	if( [returnedType.string length] == 0) then 
+		table = name.string; 
 	else
-		sql += "UPDATE ";
-
-		sql += "`fakeTable` " ;
-
-		sql += "SET ... ";
+		table = returnedType.string;
 	end
 
-
-		
-
-	sql += ";\n";
-}
-
-override method @DeleteQuery toSql 
-	?!@string sql
-	{ 
-
-	sql = "";
-	sql += "/* Requete "+name.string +"*/\n"
-	sql += "DELETE FROM ";
-
-	sql += "`fakeTable`" + " " ;
-
-	# les conditions et autres directives sql
-	# ---------------------------------------------------
-
-	@MemberList mlist = [parameters mLvalue]
-
-	#si des paramètres ont été fournis
-	@uint argsCount = [mlist length]
-	if(argsCount > 0) then  
-		for member in mlist do 
-			if ( [[member mMember] mKey] == "if" ) then 
-				############@LValue conditions = [[member mMember ] mValue]				 
-				@LValueList conditions = {};
-				[[[member mMember ] mValue] getArray !?conditions]
-				@string conditionsStr = "";
-				@uint nbCond = [conditions length]
-				@uint it = 0;
-				
-				for c in conditions do
-					@string cstr = ""
-					[[c mItem] getString !?cstr] 
-					conditionsStr += cstr+ " "
-					if (it < nbCond -1 ) then 
-						conditionsStr += " "
-					end
-					it++ 
-				end
-				sql += "WHERE "+conditionsStr+" "
-			end
-		end
-		#
+	if( [table containsCharacter !'*']  ==  true ) then 
+		table = [table subStringFromIndex !1] 
 	end
-
-	sql += ";\n";
 }

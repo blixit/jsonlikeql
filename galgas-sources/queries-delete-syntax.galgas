@@ -46,3 +46,60 @@ rule <queryDelete>
 #	S E M A N T I Q U E   -   F U N C T I O N S
 #------------------------------------------------------------
 
+
+override method @DeleteQuery toSql 
+	?!@string sql
+	{ 
+
+	@LocalError erreur = {};
+	@string ErrorifArgsRequired = "If-args-required";
+	[!? erreur insertKey !.new{!ErrorifArgsRequired !@location.here}]
+
+	sql = "";
+	sql += "/* Requete DELETE `"+name.string +"` */\n"
+	sql += "DELETE FROM ";
+
+	@string table = ""; 
+
+	[self getFinalType !? table ] 
+
+	sql += "`" + table + "` " ;
+
+	# les conditions et autres clauses sql
+	# ---------------------------------------------------
+
+	@MemberList mlist = [parameters mLvalue]
+
+	#si des paramètres ont été fournis
+	@uint argsCount = [mlist length]
+	if(argsCount > 0) then  
+		for member in mlist do 
+			if ( [[member mMember] mKey] == "if" ) then 
+				############@LValue conditions = [[member mMember ] mValue]				 
+				@LValueList conditions = {};
+				[[[member mMember ] mValue] getArray !?conditions]
+				@string conditionsStr = "";
+				@uint nbCond = [conditions length]
+				@uint it = 0;
+
+				if ( nbCond == 0) then 
+					[!? erreur insertKey !.new{!ErrorifArgsRequired !@location.here}]
+				end
+				
+				for c in conditions do
+					@string cstr = ""
+					[[c mItem] getString !?cstr] 
+					conditionsStr += cstr+ " "
+					if (it < nbCond -1 ) then 
+						conditionsStr += " "
+					end
+					it++ 
+				end
+				sql += "WHERE "+conditionsStr+" "
+			end
+		end
+		#
+	end
+
+	sql += ";\n";
+}

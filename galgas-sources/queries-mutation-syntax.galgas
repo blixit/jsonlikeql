@@ -99,3 +99,30 @@ rule <fieldMutator>
 #------------------------------------------------------------
 #	S E M A N T I Q U E   -   F U N C T I O N S
 #------------------------------------------------------------
+
+override method @MutateQuery toSql 
+	?!@string sql
+	{
+	sql = "";
+	sql += "/* Requete MUTATE `"+name.string +"` */\n"
+
+
+	if ( [queryType char] == '+') then 
+		sql += "INSERT INTO ";
+
+		sql += "`fakeTable` " ;
+
+		sql += "VALUES (...) ";
+	else
+		sql += "UPDATE ";
+
+		sql += "`fakeTable` " ;
+
+		sql += "SET ... ";
+	end
+
+
+		
+
+	sql += ";\n";
+}

@@ -55,7 +55,7 @@ queries {
 		name = "zaz"
 	}
 	-tes ({if:["name = 'yes'"]}) 
-	-test  
+	-test({if:[]})  
 	!lm{
 		id = 5
 	}
