@@ -23,7 +23,7 @@ echo "Erreurs or Warnings : " $Erreurs
 if [[ $Erreurs -gt 0 ]]; then 
 	echo "Errors found here !!"
 	cat $LOGFILE 
-	exit
+	exit 1
 fi  
 
 if [ -f $EXEC ]; then
@@ -43,10 +43,9 @@ if [[ MAKEFILEUNIX -eq 1 && -f ./makefile-unix/$PROJECT ]]; then
 			echo -e "Testing file " $file " ..."
 			./makefile-unix/$PROJECT $file
 			if [ $? -ne "0" ];	then
-				exit
+				exit 1
 			fi
 			echo -e "Done !" $?
 		fi
 	done
 fi
- 
