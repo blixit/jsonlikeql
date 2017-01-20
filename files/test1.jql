@@ -48,7 +48,7 @@ queries {
 			name: 'f'
 		},
 		name = "alain",
-		logement = 5,,
+		logement = 5,
 		age=15
 	}
 	+funct(){
