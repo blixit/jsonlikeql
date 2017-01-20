@@ -35,32 +35,30 @@ rule <query>
 
 	# détection des champs de la requete
 
-	@QueryMap fieldsQ = .default;
-	@FieldsMap fieldsF = .default;
+	@QueryMap fieldsQ = .default; 
 
 	select or
-		<fields> !queryType !?fieldsQ !?fieldsF !functionsMap
+		<fields> !queryType !?fieldsQ !functionsMap
 	end
 
 	@lstring returnedType = .default
 	getFunctionReturnedType( !name !functionsMap !? returnedType);
 
 	query = @SelectQuery.new{ !name !@lchar.new{!queryType !@location.here}  !parameters !returnedType !fieldsQ !propagation }
+
 }
 
 rule <fields> 
 	? @lchar queryType
-	?! @QueryMap fieldsQ
-	?! @FieldsMap fieldsF
+	?! @QueryMap fieldsQ 
 	? @FunctionsMap functionsMap
 	{
 	
 	${$ 
 	select or
 		repeat
-			@Query query = @Query.default;
-			@LValue lvalue = .default;
-			<field> !queryType !?query !?lvalue !functionsMap
+			@Query query = @Query.default; 
+			<field> !queryType !?query !functionsMap
 
 			if( [[[query name] string] length] > 0 ) then 
 				[!? fieldsQ insertKey ![query name] !query]
@@ -75,13 +73,14 @@ rule <fields>
 
 rule <field> 
 	? @lchar queryType
-	?! @Query query
-	?! @LValue lvalue
+	?! @Query query 
 	? @FunctionsMap functionsMap
 	{
 	$identifier$ ?let @lstring name
 
-	@ObjectLV parameters = .default;
+	@ObjectLV parameters = .default;	
+	@Propagation propagation = @Propagation.default_;
+	@QueryMap fieldsQ = .default; 
 
 	select 
 
@@ -90,27 +89,24 @@ rule <field>
 		select or				
 			<function_parameters> !?parameters
 		end 
-
+		
 		# détection de la propagation : seulement pour les fonctions de type select
-		@Propagation propagation = @Propagation.default_;
-
 		select or
 			<propagation> !? propagation
 		end
-
-		@QueryMap fieldsQ = .default;
-		@FieldsMap fieldsF = .default;
-		<fields> !queryType !?fieldsQ !?fieldsF !functionsMap
+		
+		<fields> !queryType !?fieldsQ !functionsMap
  
- 		#####
-		# lorsque je ferai la semantique dynamique de cette requete, je regarderai comment on gère le type retourné
-		#####
-
-		@lstring returnedType  =  .default
-
-		query = @SelectQuery.new{ !name !@lchar.new{!queryType !@location.here}  !parameters !returnedType !fieldsQ !propagation }
-		 
 	end
+
+	#####
+	# lorsque je ferai la semantique dynamique de cette requete, je regarderai comment on gère le type retourné
+	#####
+
+	@lstring returnedType  =  .default
+
+	query = @SelectQuery.new{ !name !@lchar.new{!queryType !@location.here}  !parameters !returnedType !fieldsQ !propagation }
+
 }
 
 rule <propagation> 
@@ -136,22 +132,54 @@ rule <propagation>
 override method @SelectQuery toSql 
 	?!@string sql
 	{ 
+
+	@LocalError erreur = {};
+	@string ErrorifArgsRequired = "If-args-required";
+	[!? erreur insertKey !.new{!ErrorifArgsRequired !@location.here}]
+
 	sql = "";
-	sql += "/* Requete SELECT `"+name.string +"` */\n"
-	sql += "SELECT FROM ";
+	sql += "/* Requete SELECT `"+name.string +"` */\n";
 
-	sql += "`fakeTable` " ;
+	@string table = ""; 
 
-	sql += "VALUES ... ;";
+	#log fields
+
+	[self getMainTable !? table ]
+
+	sql += "SELECT ";
+
+	@string fieldsStr = ""; 
+	@uint count = [fields count];
+	@uint i = 0;
+
+	if( count > 0 ) then 
+		for () in fields do 
+			fieldsStr += [[query name] string] 
+
+			if( i < count -1) then 
+				fieldsStr += ", "; 
+			end
+			i++;
+		end
+		sql += fieldsStr + " ";
+	else
+		sql += "* ";
+	end
+
+	
+
+	sql += "FROM ";
+
+	sql += "`"+ table +"` " ;
 
 	# les conditions et autres directives sql
 	# ---------------------------------------------------
 
 	@MemberList mlist = [parameters mLvalue]
-
+ 
 	#si des paramètres ont été fournis
 	@uint argsCount = [mlist length]
-	if(1==0 && argsCount > 0) then  
+	if(argsCount > 0) then  
 		for member in mlist do 
 			if ( [[member mMember] mKey] == "if" ) then 
 				############@LValue conditions = [[member mMember ] mValue]				 
@@ -160,6 +188,10 @@ override method @SelectQuery toSql
 				@string conditionsStr = "";
 				@uint nbCond = [conditions length]
 				@uint it = 0;
+
+				if( nbCond == 0) then 
+					[!? erreur insertKey !.new{!ErrorifArgsRequired !@location.here}]
+				end
 				
 				for c in conditions do
 					@string cstr = ""

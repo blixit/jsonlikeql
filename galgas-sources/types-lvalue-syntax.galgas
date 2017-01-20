@@ -12,22 +12,22 @@ class @LValue{
 }
 	method @LValue getArray
 		?!@LValueList value
-		{}
+		{ value = .default ; }
 	method @LValue getInteger
 		?!@uint value
-		{}
+		{ value = .default ; }
 	method @LValue getDouble
 		?!@double value
-		{}
+		{ value = .default ; }
 	method @LValue getString
 		?!@string value
-		{}
+		{ value = .default ; }
 	method @LValue getChar
 		?!@char value
-		{}
+		{ value = .default ; }
 	method @LValue getBool
 		?!@bool value
-		{}
+		{ value = .default ; }
 
 class @IntegerLV : @LValue{
 	@uint mLvalue;
@@ -87,24 +87,6 @@ list @LValueList {
 #------------------------------------------------------------
 
 syntax extension jsonlikeql_syntax {
-
-rule <primitive_lvalue> ?!@luint pi ?!@ldouble pd ?!@lstring ps ?!@lchar pc ?!@lbool pb {
-	select 
-		$integer$ ?let @luint i
-		pi = i
-	or
-		$real$ ?let @ldouble d
-		pd = d
-	or
-		$"string"$ ?let @lstring s
-		ps = s
-	or
-		$'char'$ ?let @lchar c
-		pc = c
-	or
-		<bool_definition> !? pb 
-	end
-}
 
 rule <bool_definition> ?!@lbool b{
 	select 
@@ -188,3 +170,38 @@ rule <array_definition>
 #------------------------------------------------------------
 #	S E M A N T I Q U E   -   F U N C T I O N S
 #------------------------------------------------------------
+method @LValue toString 
+	?!@string valuesStr
+	{
+
+	@LocalError erreur = {};
+	@string ErrorObjectValueNotAllowed = "ObjectValueNotAllowed";
+	@string ErrorArrayValueNotAllowed = "ArrayValueNotAllowed";
+	[!? erreur insertKey !.new{!ErrorObjectValueNotAllowed !@location.here}]
+	[!? erreur insertKey !.new{!ErrorArrayValueNotAllowed !@location.here}]
+
+	if( self is == @IntegerLV ) then  
+		@uint lv = [self as @IntegerLV mLvalue]   
+		valuesStr += lv  
+	elsif( self is == @DoubleLV ) then  
+		@double lv = [self as @DoubleLV mLvalue]   
+		valuesStr += lv  
+	elsif( self is == @CharLV ) then   
+		@char lv = [self as @CharLV mLvalue]   
+		valuesStr += "'"+lv+"'"  
+	elsif( self is == @StringLV ) then   
+		@string lv = [self as @StringLV mLvalue]   
+		valuesStr += "\""+lv+"\""  
+	elsif( self is == @BoolLV ) then   
+		@bool lv = [self as @BoolLV mLvalue]   
+		if( lv == true ) then 
+			valuesStr += '1';
+		else
+			valuesStr += '0';
+		end
+	elsif( self is == @ObjectLV ) then
+		[!? erreur insertKey !.new{!ErrorObjectValueNotAllowed !@location.here}] 
+	elsif( self is == @ArrayLV ) then
+		[!? erreur insertKey !.new{!ErrorArrayValueNotAllowed !@location.here}] 
+	end
+}

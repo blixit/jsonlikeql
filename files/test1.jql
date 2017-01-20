@@ -37,16 +37,18 @@ functions {
 }
 
 queries {
-	:test({jk:5, kl:"re", array:[]}) propagate default{
+	:test({if:["age > 18 AND name = 'blixit' "] , kl:"re", array:[]}) propagate default{
+		age{},
 		adresse1 {
 			id
-		}
+		},
+		name,
+		otherfield,
+		message
 	}
 	:aire 
 	+ajouterUser(){ 
-		id = {
-			name: 'f'
-		},
+		id = '5',
 		name = "alain",
 		logement = 5,
 		age=15
@@ -55,8 +57,9 @@ queries {
 		name = "zaz"
 	}
 	-tes ({if:["name = 'yes'"]}) 
-	-test({if:[]})  
+	-test({})  
 	!lm{
-		id = 5
+		id = 5,
+		name = "blixit"
 	}
 }

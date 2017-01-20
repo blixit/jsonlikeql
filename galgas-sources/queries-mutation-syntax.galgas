@@ -33,11 +33,10 @@ rule <queryMutator>
 	#end
 
 	# détection des champs de la requete
-
-	@QueryMap fieldsQ = .default;
+ 
 	@FieldsMap fieldsF = .default;
 
-	<fieldsMutator> !queryType !?fieldsQ !?fieldsF	 
+	<fieldsMutator> !queryType !?fieldsF	 
 
 	@lstring returnedType = .default
 
@@ -47,8 +46,7 @@ rule <queryMutator>
 }
 
 rule <fieldsMutator> 
-	? @lchar queryType
-	?! @QueryMap fieldsQ
+	? @lchar queryType 
 	?! @FieldsMap fieldsF
 	{
 	
@@ -103,22 +101,71 @@ rule <fieldMutator>
 override method @MutateQuery toSql 
 	?!@string sql
 	{
+
+	@LocalError erreur = {};
+	@string ErrorObjectValueNotAllowed = "ObjectValueNotAllowed";
+	@string ErrorArrayValueNotAllowed = "ArrayValueNotAllowed";
+	[!? erreur insertKey !.new{!ErrorObjectValueNotAllowed !@location.here}]
+	[!? erreur insertKey !.new{!ErrorArrayValueNotAllowed !@location.here}]
+
 	sql = "";
 	sql += "/* Requete MUTATE `"+name.string +"` */\n"
 
+	@string table = ""; 
+
+	[self getMainTable !? table ] 
 
 	if ( [queryType char] == '+') then 
 		sql += "INSERT INTO ";
 
-		sql += "`fakeTable` " ;
+		sql += "`"+ table +"` " ;
 
-		sql += "VALUES (...) ";
+		@string fieldsStr = "";
+		@string valuesStr = "";
+		@uint count = [fields count];
+		@uint i = 0;		 
+
+		for () in fields do 
+			fieldsStr += [lkey string] 		
+
+			@string value = .default
+			[lvalue toString !?value]
+
+			valuesStr += value;				
+
+			if( i < count -1) then 
+				fieldsStr += ", ";
+				valuesStr += ", ";
+			end
+			i++; 
+		end
+
+		sql += "( "+ fieldsStr +" ) "; 
+
+		sql += "VALUES ("+ valuesStr +") "; 
+
 	else
 		sql += "UPDATE ";
 
-		sql += "`fakeTable` " ;
+		sql += "`"+ table +"` " ;
 
-		sql += "SET ... ";
+		@string fieldsStr = ""; 
+		@uint count = [fields count];
+		@uint i = 0;	
+
+		for () in fields do
+			@string value = .default
+			[lvalue toString !?value]
+
+			fieldsStr += [lkey string] + " = " + value;
+
+			if( i < count -1) then 
+				fieldsStr += ", "; 
+			end
+			i++;
+		end
+
+		sql += "SET " + fieldsStr;
 	end
 
 
@@ -126,3 +173,4 @@ override method @MutateQuery toSql
 
 	sql += ";\n";
 }
+

@@ -12,22 +12,12 @@ LOGGALGAS=galgas.log
 
 MAKEFILEUNIX=1
 
-COMPILARGS=--max-errors=0 --max-warnings=0
+COMPILARGS=--max-errors=1 #--max-warnings=0
 
 export PATH=$PATH:$DIR
 
 rm -f $LOGFILE
-galgas  +${PROJECT}.galgasProject $COMPILARGS --emit-syntax-diagrams --output-html-grammar-file > $LOGFILE
-
-
-Erreurs=`awk '/./{line=$0} END{print line}' $LOGFILE | grep -Eo '[0-9]{1,4}' | awk '/[0-9]+/{i++}i==1'`
-echo "Erreurs or Warnings : " $Erreurs
-
-if [[ $Erreurs -gt 0 ]]; then 
-	echo "Errors found here !!"
-	cat $LOGFILE 
-	exit 1
-fi  
+galgas  +${PROJECT}.galgasProject $COMPILARGS --emit-syntax-diagrams --output-html-grammar-file #> $LOGFILE
 
 if [ -f $EXEC ]; then
 	echo -e "Deleting old executable ..."
@@ -37,22 +27,23 @@ fi
 
 ./makefile-unix/build.py
 
-
-
 #run after compiling to accelerate the development
 if [[ MAKEFILEUNIX -eq 1 && -f ./makefile-unix/$PROJECT ]]; then 
 	echo -e "Starting tests ... "
+	
+	# deleting old jql files
+	rm -rf $DIR/files/*.sql
+
 	for file in $DIR/files/*.jql 
-	do 
-		echo -e $file
+	do  
 		if [[ -f $file ]]; then 
-			echo -e "Testing file " $file " ..."
-			./makefile-unix/$PROJECT $file 
+			echo "Testing file " $file " ..."
+			./makefile-unix/$PROJECT $COMPILARGS $file 
 			if [[ $? -gt 0 || $? -lt 0 ]];	then
 				exit 1
 			fi
-			echo -e "Done !" $?
+			echo -e "Done !"
 		fi
 	done
-	echo -e "All tests passed ! "
+	echo -e "All tests passed !! "
 fi

@@ -18,7 +18,7 @@ class @Query{
 }
 	method @Query toSql 
 		?!@string sql
-	{ }
+	{ sql = .default; }
 
 
 class @SelectQuery : @Query{
