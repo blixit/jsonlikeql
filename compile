@@ -4,7 +4,7 @@
 
 PROJECT=jsonlikeql
 EXT=jql
-DIR=.
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 EXEC=$DIR/makefile-unix/$PROJECT
 
 LOGFILE=build.log
@@ -36,8 +36,9 @@ fi
 
 #run after compiling to accelerate the development
 if [[ MAKEFILEUNIX -eq 1 && -f ./makefile-unix/$PROJECT ]]; then 
-	for file in $DIR/files/* 
+	for file in $DIR/files/*.jql 
 	do 
+		echo -e $file
 		if [[ -f $file ]]; then 
 			echo -e "Testing file " $file " ..."
 			./makefile-unix/$PROJECT $file
@@ -48,3 +49,4 @@ if [[ MAKEFILEUNIX -eq 1 && -f ./makefile-unix/$PROJECT ]]; then
 		fi
 	done
 fi
+ 
