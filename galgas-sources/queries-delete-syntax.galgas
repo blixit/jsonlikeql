@@ -1,0 +1,34 @@
+
+#------------------------------------------------------------
+#	S E M A N T I Q U E   -   C L A S S
+#------------------------------------------------------------
+
+#------------------------------------------------------------
+#	S Y N T A X
+#------------------------------------------------------------
+
+syntax extension jsonlikeql_syntax {
+
+#	D E L E T E     Q U E R I E S
+#------------------------------------------------------------
+rule <queryDelete> 
+	? @lchar queryType
+	?! @Query query
+	{ 
+	$identifier$ ?let @lstring name 
+
+	# détection des paramètres
+
+	@ObjectLV parameters = .default;
+	select or
+	<function_parameters> !? parameters
+	end  
+ 
+	query = @DeleteQuery.new{ !name !@lchar.new{!queryType !@location.here}  !parameters  } 
+}
+
+}
+
+#------------------------------------------------------------
+#	S E M A N T I Q U E   -   F U N C T I O N S
+#------------------------------------------------------------

@@ -3,6 +3,7 @@ syntax jsonlikeql_syntax (jsonlikeql_lexique) {
 rule <start_symbol> {
 
 	@ClassMap classMap = {};
+
 	@CandidateClassMap candidateClassMap = {};
 
 	@FunctionsMap functionsMap = {};
@@ -37,8 +38,7 @@ rule <start_symbol> {
 	while
 		<queries_container> !? queryMap
 	end
-	$}$
-	#log queryMap
+	$}$ 
 }
 
 

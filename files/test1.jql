@@ -37,30 +37,25 @@ functions {
 }
 
 queries {
-	:
-		test({jk:5, kl:"re", array:[]}) propagate default
-	:
-		aire 
-	+ 
-		ajouterUser() propagate full{ 
-			id = {
-				name: 'f'
-			},
-			name = "alain",
-			logement() propagate default{
-				id = 5,
-				get,
-				pseudo,
-				pass	
-			},
-			age=15
-
+	:test({jk:5, kl:"re", array:[]}) propagate default{
+		adresse1 {
+			id
 		}
-	-
-		tes
-	:
-		test propagate full
-		Logements	
-	!
-		lm
+	}
+	:aire 
+	+ajouterUser(){ 
+		id = {
+			name: 'f'
+		},
+		name = "alain",
+		logement = 5,
+		age=15
+	}
+	+funct(){
+		name = "zaz"
+	}
+	-tes ({}) 
+	!lm{
+		id = 5
+	}
 }

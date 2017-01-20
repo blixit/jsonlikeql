@@ -1,0 +1,89 @@
+
+#------------------------------------------------------------
+#	S E M A N T I Q U E   -   C L A S S
+#------------------------------------------------------------
+
+#------------------------------------------------------------
+#	S Y N T A X
+#------------------------------------------------------------
+
+syntax extension jsonlikeql_syntax {
+
+#	M U T A T I O N     Q U E R I E S
+#------------------------------------------------------------
+
+rule <queryMutator> 
+	? @lchar queryType
+	?! @Query query
+	{ 
+	$identifier$ ?let @lstring name 
+
+	# détection des paramètres
+
+	@ObjectLV parameters = .default;
+	select or
+	<function_parameters> !? parameters
+	end  
+
+	# détection des champs de la requete
+
+	@QueryMap fieldsQ = .default;
+	@FieldsMap fieldsF = .default;
+
+	<fieldsMutator> !queryType !?fieldsQ !?fieldsF	
+ 
+	query = @MutateQuery.new{ !name !@lchar.new{!queryType !@location.here}  !parameters !fieldsF } 
+}
+
+rule <fieldsMutator> 
+	? @lchar queryType
+	?! @QueryMap fieldsQ
+	?! @FieldsMap fieldsF
+	{
+	
+	${$ 
+		@Query query = @Query.default;
+		@LValue lvalue = .default;
+		<fieldMutator> !queryType !?query !?lvalue
+
+		if( [[[query name] string] length] > 0 ) then  
+	 		[!? fieldsF insertKey ![query name] !lvalue] 
+ 		end
+
+		select or
+			$,$
+			repeat
+				query = @Query.default;
+				lvalue = .default;
+				<fieldMutator> !queryType !?query !?lvalue
+
+				if( [[[query name] string] length] > 0 ) then  
+			 		[!? fieldsF insertKey ![query name] !lvalue] 
+		 		end
+			while
+			$,$
+			end
+		end
+	$}$ 
+}
+
+rule <fieldMutator> 
+	? @lchar queryType
+	?! @Query query
+	?! @LValue lvalue
+	{
+	$identifier$ ?let @lstring name
+
+	@ObjectLV parameters = .default;
+ 
+	@FieldsMap fields = .default; 
+ 
+	$=$ <value_definition> !? lvalue
+	query = @MutateQuery.new{ !name !@lchar.new{!queryType !@location.here}  !parameters !fields }
+}
+
+}
+
+#------------------------------------------------------------
+#	S E M A N T I Q U E   -   F U N C T I O N S
+#------------------------------------------------------------

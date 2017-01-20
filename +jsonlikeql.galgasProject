@@ -26,5 +26,8 @@ project (0:0:1) -> "jsonlikeql" {
   "galgas-sources/class-syntax.galgas"
   "galgas-sources/function-syntax.galgas"
   "galgas-sources/queries-syntax.galgas"
+  "galgas-sources/queries-select-syntax.galgas"
+  "galgas-sources/queries-mutation-syntax.galgas"
+  "galgas-sources/queries-delete-syntax.galgas"
 }
 

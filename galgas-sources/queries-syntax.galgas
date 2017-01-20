@@ -23,6 +23,8 @@ class @SelectQuery : @Query{
 class @MutateQuery : @Query{
 	@FieldsMap fields 
 }
+class @DeleteQuery : @Query{ 
+}
 
 map @QueryMap{
 	@Query query
@@ -47,152 +49,61 @@ rule <queries_container>
 	{  
 
 	@lchar queryType = .default;
-	select $:$ queryType.char = ':'	
-	or	$+$	queryType.char = '+'	
-	or	$!$	queryType.char = '!'	
-	or	$-$	queryType.char = '-'	
-	end 
- 
- 	@Query query = .default;
-
- 	<query> ! queryType !? query
-
- 	@lstring key = @lstring.new{![[queryMap count] string] !@location.here}; 
- 	[!? queryMap insertKey !key !query] 
-
-	repeat
-	while
-		query = @Query.default;
-		<query> ! queryType !? query
-		key = @lstring.new{![[queryMap count] string] !@location.here}; 
- 		[!? queryMap insertKey !key !query] 
-	end
-}
-
-rule <query> 
-	? @lchar queryType
-	?! @Query query
-	{ 
-	$identifier$ ?let @lstring name 
-
-	# détection des paramètres
-
-	@ObjectLV parameters = .default;
-	select or
-	<function_parameters> !? parameters
-	end 
-
-	# détection de la propagation : seulement pour les fonctions de type select
-
-	@Propagation propagation = @Propagation.default_;
-	select or
-	<propagation> !? propagation
-	end
-
-	# détection des champs de la requete
-
-	@QueryMap fieldsQ = .default;
-	@FieldsMap fieldsF = .default;
-
-	select or
-		<fields> !queryType !?fieldsQ !?fieldsF
-	end
-
-	if( [queryType char] == ':' ) then
-		query = @SelectQuery.new{ !name !@lchar.new{!queryType !@location.here}  !parameters !fieldsQ !propagation }
-	else
-		query = @MutateQuery.new{ !name !@lchar.new{!queryType !@location.here}  !parameters !fieldsF } 
- 	end
-}
-
-rule <propagation> 
-	?! @Propagation propagation
-	{
-
-	$propagate$ 
 	select 
-		$default$
-		propagation = @Propagation.default_
-	or
-		$full$
-		propagation = @Propagation.full_
-	end	
-}
+		$:$ queryType.char = ':'
 
-rule <fields> 
-	? @lchar queryType
-	?! @QueryMap fieldsQ
-	?! @FieldsMap fieldsF
-	{
-	
-	${$ 
-	select or
+		@Query query = .default;
+
+	 	<query> ! queryType !? query
+
+	 	@lstring key = @lstring.new{![[queryMap count] string] !@location.here}; 
+	 	[!? queryMap insertKey !key !query] 
+
 		repeat
-			@Query query = @Query.default;
-			@LValue lvalue = .default;
-			<field> !queryType !?query !?lvalue
-
-			if( [[[query name] string] length] > 0 ) then 
-				if( [queryType char] == ':' ) then 
-		 			[!? fieldsQ insertKey ![query name] !query]
-		 		else 
-		 			[!? fieldsF insertKey ![query name] !lvalue]
-		 		end
-	 		end
 		while
-		$,$
+			query = @Query.default;
+			<query> ! queryType !? query
+			key = @lstring.new{![[queryMap count] string] !@location.here}; 
+	 		[!? queryMap insertKey !key !query] 
 		end
-	end
-	$}$ 
-}
+	or	
+		select 
+			$+$	queryType.char = '+'	
+		or	$!$	queryType.char = '!' 
+		end 
 
-rule <field> 
-	? @lchar queryType
-	?! @Query query
-	?! @LValue lvalue
-	{
-	$identifier$ ?let @lstring name
+		@Query query = .default;
 
-	@ObjectLV parameters = .default;
+	 	<queryMutator> ! queryType !? query
 
-	select 
+	 	@lstring key = @lstring.new{![[queryMap count] string] !@location.here}; 
+	 	[!? queryMap insertKey !key !query] 
 
-	or	 
-		select 								# mutate queries 
-			@FieldsMap fields = .default; 
-
-			#@LValue lvalue = @LValue.default;
-			$=$ <value_definition> !? lvalue
-			query = @MutateQuery.new{ !name !@lchar.new{!queryType !@location.here}  !parameters !fields }
-		or 									# select queries 
-			# détection des paramètres
-
-			select or				
-				<function_parameters> !?parameters
-			end 
-
-			# détection de la propagation : seulement pour les fonctions de type select
-			@Propagation propagation = @Propagation.default_;
-
-			select or
-				<propagation> !? propagation
-			end
-
-			@QueryMap fieldsQ = .default;
-			@FieldsMap fieldsF = .default;
-			<fields> !queryType !?fieldsQ !?fieldsF
- 
-			if( [queryType char] == ':' ) then
-				query = @SelectQuery.new{ !name !@lchar.new{!queryType !@location.here}  !parameters !fieldsQ !propagation }
-			else
-				query = @MutateQuery.new{ !name !@lchar.new{!queryType !@location.here}  !parameters !fieldsF }
-		 	end
+		repeat
+		while
+			query = @Query.default;
+			<queryMutator> ! queryType !? query
+			key = @lstring.new{![[queryMap count] string] !@location.here}; 
+	 		[!? queryMap insertKey !key !query] 
 		end
-	end
+	or 
+		$-$	queryType.char = '-'
+		@Query query = .default;
 
+	 	<queryDelete> ! queryType !? query
+
+	 	@lstring key = @lstring.new{![[queryMap count] string] !@location.here}; 
+	 	[!? queryMap insertKey !key !query] 
+
+		repeat
+		while
+			query = @Query.default;
+			<queryDelete> ! queryType !? query
+			key = @lstring.new{![[queryMap count] string] !@location.here}; 
+	 		[!? queryMap insertKey !key !query] 
+		end
+	end	 	
 }
-	
- 
 
 }
 

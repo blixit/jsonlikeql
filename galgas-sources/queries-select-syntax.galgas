@@ -1,0 +1,122 @@
+
+#------------------------------------------------------------
+#	S E M A N T I Q U E   -   C L A S S
+#------------------------------------------------------------
+
+#------------------------------------------------------------
+#	S Y N T A X
+#------------------------------------------------------------
+
+syntax extension jsonlikeql_syntax {
+
+
+#	S E L E C T     Q U E R I E S
+#------------------------------------------------------------
+rule <query> 
+	? @lchar queryType
+	?! @Query query
+	{ 
+	$identifier$ ?let @lstring name 
+
+	# détection des paramètres
+
+	@ObjectLV parameters = .default;
+	select or
+	<function_parameters> !? parameters
+	end 
+
+	# détection de la propagation : seulement pour les fonctions de type select
+
+	@Propagation propagation = @Propagation.default_;
+	select or
+	<propagation> !? propagation
+	end
+
+	# détection des champs de la requete
+
+	@QueryMap fieldsQ = .default;
+	@FieldsMap fieldsF = .default;
+
+	select or
+		<fields> !queryType !?fieldsQ !?fieldsF
+	end
+
+	query = @SelectQuery.new{ !name !@lchar.new{!queryType !@location.here}  !parameters !fieldsQ !propagation }
+}
+
+rule <fields> 
+	? @lchar queryType
+	?! @QueryMap fieldsQ
+	?! @FieldsMap fieldsF
+	{
+	
+	${$ 
+	select or
+		repeat
+			@Query query = @Query.default;
+			@LValue lvalue = .default;
+			<field> !queryType !?query !?lvalue
+
+			if( [[[query name] string] length] > 0 ) then 
+				[!? fieldsQ insertKey ![query name] !query]
+		 		 
+	 		end
+		while
+		$,$
+		end
+	end
+	$}$ 
+}
+
+rule <field> 
+	? @lchar queryType
+	?! @Query query
+	?! @LValue lvalue
+	{
+	$identifier$ ?let @lstring name
+
+	@ObjectLV parameters = .default;
+
+	select 
+
+	or	  
+		# détection des paramètres
+		select or				
+			<function_parameters> !?parameters
+		end 
+
+		# détection de la propagation : seulement pour les fonctions de type select
+		@Propagation propagation = @Propagation.default_;
+
+		select or
+			<propagation> !? propagation
+		end
+
+		@QueryMap fieldsQ = .default;
+		@FieldsMap fieldsF = .default;
+		<fields> !queryType !?fieldsQ !?fieldsF
+
+		query = @SelectQuery.new{ !name !@lchar.new{!queryType !@location.here}  !parameters !fieldsQ !propagation }
+		 
+	end
+}
+
+rule <propagation> 
+	?! @Propagation propagation
+	{
+
+	$propagate$ 
+	select 
+		$default$
+		propagation = @Propagation.default_
+	or
+		$full$
+		propagation = @Propagation.full_
+	end	
+}
+
+}
+
+#------------------------------------------------------------
+#	S E M A N T I Q U E   -   F U N C T I O N S
+#------------------------------------------------------------
