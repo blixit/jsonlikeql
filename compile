@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#! /bin/bash
+set -e
 
 PROJECT=jsonlikeql
 EXT=jql
@@ -12,10 +12,13 @@ LOGGALGAS=galgas.log
 
 MAKEFILEUNIX=1
 
+COMPILARGS=--max-errors=0 --max-warnings=0
+
 export PATH=$PATH:$DIR
 
 rm -f $LOGFILE
-galgas  +${PROJECT}.galgasProject --emit-syntax-diagrams --output-html-grammar-file > $LOGFILE
+galgas  +${PROJECT}.galgasProject $COMPILARGS --emit-syntax-diagrams --output-html-grammar-file > $LOGFILE
+
 
 Erreurs=`awk '/./{line=$0} END{print line}' $LOGFILE | grep -Eo '[0-9]{1,4}' | awk '/[0-9]+/{i++}i==1'`
 echo "Erreurs or Warnings : " $Erreurs
@@ -34,18 +37,22 @@ fi
 
 ./makefile-unix/build.py
 
+
+
 #run after compiling to accelerate the development
 if [[ MAKEFILEUNIX -eq 1 && -f ./makefile-unix/$PROJECT ]]; then 
+	echo -e "Starting tests ... "
 	for file in $DIR/files/*.jql 
 	do 
 		echo -e $file
 		if [[ -f $file ]]; then 
 			echo -e "Testing file " $file " ..."
-			./makefile-unix/$PROJECT $file
-			if [ $? -ne "0" ];	then
+			./makefile-unix/$PROJECT $file 
+			if [[ $? -gt 0 || $? -lt 0 ]];	then
 				exit 1
 			fi
 			echo -e "Done !" $?
 		fi
 	done
+	echo -e "All tests passed ! "
 fi
