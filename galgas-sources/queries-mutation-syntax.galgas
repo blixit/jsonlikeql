@@ -168,27 +168,12 @@ override method @MutateQuery toSql
 		end
 
 		sql += "SET " + fieldsStr+" ";
-
-		@MemberList mlist = [parameters mLvalue]
-
-		#si des paramètres ont été fournis
-		@uint argsCount = [mlist length]
-		if(argsCount > 0) then  
-			for member in mlist do 
-				if ( [[member mMember] mKey] == "if" ) then 
-					@Member m = [member mMember]
-					@LValue lv = [m mValue]
-					if ( (lv is == @StringLV) == false) then
-						[!? erreur insertKey !.new{!ErrorifArgRequiresStringValue !@location.here}]
-					end
-					############@LValue conditions = [[member mMember ] mValue]				 
-					@string conditions = "";
-					[lv getString !?conditions]
-
-					sql += "WHERE "+conditions+" "
-				end
-			end
-			#
+		
+		@string conditions = .default
+		[self getIfParameterToString !?conditions ![parameters mLvalue] !ErrorifArgRequiresStringValue !erreur ] 
+	 
+		if ([conditions length] > 0) then
+			sql += "WHERE "+conditions+" "
 		end
 
 	end

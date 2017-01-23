@@ -176,45 +176,13 @@ override method @SelectQuery toSql
 
 	# les conditions et autres directives sql
 	# ---------------------------------------------------
+	@string conditions = .default
+	[self getIfParameterToString !?conditions ![parameters mLvalue] !ErrorifArgRequiresStringValue !erreur ] 
 
-	@MemberList mlist = [parameters mLvalue]
- 
-	#si des paramètres ont été fournis
-	@uint argsCount = [mlist length]
-	if(argsCount > 0) then  
-		for member in mlist do 
-			if ( [[member mMember] mKey] == "if" ) then 
-				@Member m = [member mMember]
-				@LValue lv = [m mValue]
-				if ( (lv is == @StringLV) == false) then
-					[!? erreur insertKey !.new{!ErrorifArgRequiresStringValue !@location.here}]
-				end
-				############@LValue conditions = [[member mMember ] mValue]				 
-				@string conditions = "";
-				[lv getString !?conditions] 
-				#@string conditionsStr = "";
-				#@uint nbCond = [conditions length]
-				#@uint it = 0;
-
-				#if( nbCond == 0) then 
-				#	[!? erreur insertKey !.new{!ErrorifArgsRequired !@location.here}]
-				#end
-				
-				#for c in conditions do
-				#	@string cstr = ""
-				#	[[c mItem] getString !?cstr] 
-				#	conditionsStr += cstr+ " "
-				#	if (it < nbCond -1 ) then 
-				#		conditionsStr += " "
-				#	end
-				#	it++ 
-				#end
-				#sql += "WHERE "+conditionsStr+" "
-				sql += "WHERE "+conditions+" "
-			end
-		end
-		#
+	if ([conditions length] > 0) then
+		sql += "WHERE "+conditions+" "
 	end
+
 
 	sql += ";\n";
 }
