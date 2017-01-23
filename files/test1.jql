@@ -31,7 +31,7 @@ functions {
 	-
 		deleteUsers
 	:
-		getLogements	
+		getLogements	-> Boo
 	!
 		update({if:[""]})
 }

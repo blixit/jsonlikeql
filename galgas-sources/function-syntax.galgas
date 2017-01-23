@@ -63,6 +63,13 @@ rule <function>
  	@lstring returnedType = .default;
 	<function_returnedType> !? returnedType
 
+	if( [query char] == ':' && [returnedType length] == 0 ) then
+		@LocalError erreur = {};
+		@string ErrorSelectFunctionRequiresAReturnedType = "Error-Select-Function-Requires-A-Returned-Type";
+		[!? erreur insertKey !.new{!ErrorSelectFunctionRequiresAReturnedType !@location.here}]
+		[!? erreur insertKey !.new{!ErrorSelectFunctionRequiresAReturnedType !@location.here}]
+	end
+
 	function = .new{ !name !@lchar.new{!query !@location.here}  !parameters !returnedType  }
 }
 
@@ -86,11 +93,48 @@ rule <function_returnedType>
 	or
 		$->$ 
 		select  
-			$identifier$ ?let @lstring rtn
-			returnedType = rtn;
+			select 
+				$Bool$
+				returnedType.string = "Bool";
+			or
+				$Int$
+				returnedType.string = "Int";
+			or
+				$Real$
+				returnedType.string = "Real";
+			or
+				$Char$
+				returnedType.string = "Char";
+			or
+				$String$
+				returnedType.string = "String";
+			or
+				$identifier$ ?let @lstring rtn
+				returnedType = rtn;
+			end
 		or
-			$[$	$identifier$ ?let @lstring typestr	$]$ 
-			returnedType.string = "*" + typestr.string ;
+			$[$ 
+			returnedType.string = "*" ;
+			select 
+				$Bool$
+				returnedType.string += "Bool";
+			or
+				$Int$
+				returnedType.string += "Int";
+			or
+				$Real$
+				returnedType.string += "Real";
+			or
+				$Char$
+				returnedType.string += "Char";
+			or
+				$String$
+				returnedType.string += "String";
+			or
+				$identifier$ ?let @lstring rtn
+				returnedType.string += rtn.string;
+			end
+			$]$
 		end
 	end
 }

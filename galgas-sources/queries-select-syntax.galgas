@@ -17,6 +17,9 @@ rule <query>
 	?! @Query query
 	? @FunctionsMap functionsMap
 	{ 
+
+	# Construction de l'arbre
+	#----------------------------------------------------------------
 	$identifier$ ?let @lstring name 
 
 	# détection des paramètres
@@ -40,6 +43,13 @@ rule <query>
 	select or
 		<fields> !queryType !?fieldsQ !functionsMap
 	end
+
+	# Vérifications
+	#----------------------------------------------------------------
+
+
+	# Construction de la requete
+	#----------------------------------------------------------------
 
 	@lstring returnedType = .default
 	getFunctionReturnedType( !name !functionsMap !? returnedType);
@@ -128,6 +138,14 @@ rule <propagation>
 #------------------------------------------------------------
 #	S E M A N T I Q U E   -   F U N C T I O N S
 #------------------------------------------------------------
+
+func checkPropagation
+	-> @bool pass
+	{
+	pass = false;
+
+	pass = true;
+}
 
 override method @SelectQuery toSql 
 	?!@string sql
