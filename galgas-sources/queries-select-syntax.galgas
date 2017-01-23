@@ -135,7 +135,9 @@ override method @SelectQuery toSql
 
 	@LocalError erreur = {};
 	@string ErrorifArgsRequired = "If-args-required";
+	@string ErrorifArgRequiresStringValue = "If-Arg-Requires-String-Value";
 	[!? erreur insertKey !.new{!ErrorifArgsRequired !@location.here}]
+	[!? erreur insertKey !.new{!ErrorifArgRequiresStringValue !@location.here}]
 
 	sql = "";
 	sql += "/* Requete SELECT `"+name.string +"` */\n";
@@ -182,27 +184,33 @@ override method @SelectQuery toSql
 	if(argsCount > 0) then  
 		for member in mlist do 
 			if ( [[member mMember] mKey] == "if" ) then 
+				@Member m = [member mMember]
+				@LValue lv = [m mValue]
+				if ( (lv is == @StringLV) == false) then
+					[!? erreur insertKey !.new{!ErrorifArgRequiresStringValue !@location.here}]
+				end
 				############@LValue conditions = [[member mMember ] mValue]				 
-				@LValueList conditions = {};
-				[[[member mMember ] mValue] getArray !?conditions]
-				@string conditionsStr = "";
-				@uint nbCond = [conditions length]
-				@uint it = 0;
+				@string conditions = "";
+				[lv getString !?conditions] 
+				#@string conditionsStr = "";
+				#@uint nbCond = [conditions length]
+				#@uint it = 0;
 
-				if( nbCond == 0) then 
-					[!? erreur insertKey !.new{!ErrorifArgsRequired !@location.here}]
-				end
+				#if( nbCond == 0) then 
+				#	[!? erreur insertKey !.new{!ErrorifArgsRequired !@location.here}]
+				#end
 				
-				for c in conditions do
-					@string cstr = ""
-					[[c mItem] getString !?cstr] 
-					conditionsStr += cstr+ " "
-					if (it < nbCond -1 ) then 
-						conditionsStr += " "
-					end
-					it++ 
-				end
-				sql += "WHERE "+conditionsStr+" "
+				#for c in conditions do
+				#	@string cstr = ""
+				#	[[c mItem] getString !?cstr] 
+				#	conditionsStr += cstr+ " "
+				#	if (it < nbCond -1 ) then 
+				#		conditionsStr += " "
+				#	end
+				#	it++ 
+				#end
+				#sql += "WHERE "+conditionsStr+" "
+				sql += "WHERE "+conditions+" "
 			end
 		end
 		#

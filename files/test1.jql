@@ -37,7 +37,7 @@ functions {
 }
 
 queries {
-	:test({if:["age > 18 AND name = 'blixit' "] , kl:"re", array:[]}) propagate default{
+	:test({if:"age > 18 AND name = 'blixit' " , kl:"re", array:[]}) propagate default{
 		age{},
 		adresse1 {
 			id
@@ -56,9 +56,9 @@ queries {
 	+funct(){
 		name = "zaz"
 	}
-	-tes ({if:["name = 'yes'"]}) 
+	-tes ({if:"name = 'yes'"}) 
 	-test({})  
-	!lm{
+	!lm ({if:"name = 'yes'"}){
 		id = 5,
 		name = "blixit"
 	}

@@ -4,7 +4,7 @@
 * Author : Blixit
 */
 /* Requete SELECT `test` */
-SELECT adresse1, age, message, name, otherfield FROM `Montype` WHERE age > 18 AND name = 'blixit'   ;
+SELECT adresse1, age, message, name, otherfield FROM `Montype` WHERE age > 18 AND name = 'blixit'  ;
 /* Requete SELECT `aire` */
 SELECT * FROM `Montype2` ;
 /* Requete MUTATE `ajouterUser` */
@@ -12,8 +12,8 @@ INSERT INTO `User` ( age, id, logement, name ) VALUES (15, '5', 5, "alain") ;
 /* Requete MUTATE `funct` */
 INSERT INTO `funct` ( name ) VALUES ("zaz") ;
 /* Requete DELETE `tes` */
-DELETE FROM `tes` WHERE name = 'yes'  ;
+DELETE FROM `tes` WHERE name = 'yes' ;
 /* Requete DELETE `test` */
 DELETE FROM `Montype` ;
 /* Requete MUTATE `lm` */
-UPDATE `lm` SET id = 5, name = "blixit";
+UPDATE `lm` SET id = 5, name = "blixit" WHERE name = 'yes' ;

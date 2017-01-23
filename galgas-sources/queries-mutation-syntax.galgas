@@ -105,8 +105,10 @@ override method @MutateQuery toSql
 	@LocalError erreur = {};
 	@string ErrorObjectValueNotAllowed = "ObjectValueNotAllowed";
 	@string ErrorArrayValueNotAllowed = "ArrayValueNotAllowed";
+	@string ErrorifArgRequiresStringValue = "If-Arg-Requires-String-Value";
 	[!? erreur insertKey !.new{!ErrorObjectValueNotAllowed !@location.here}]
 	[!? erreur insertKey !.new{!ErrorArrayValueNotAllowed !@location.here}]
+	[!? erreur insertKey !.new{!ErrorifArgRequiresStringValue !@location.here}]
 
 	sql = "";
 	sql += "/* Requete MUTATE `"+name.string +"` */\n"
@@ -165,7 +167,30 @@ override method @MutateQuery toSql
 			i++;
 		end
 
-		sql += "SET " + fieldsStr;
+		sql += "SET " + fieldsStr+" ";
+
+		@MemberList mlist = [parameters mLvalue]
+
+		#si des paramètres ont été fournis
+		@uint argsCount = [mlist length]
+		if(argsCount > 0) then  
+			for member in mlist do 
+				if ( [[member mMember] mKey] == "if" ) then 
+					@Member m = [member mMember]
+					@LValue lv = [m mValue]
+					if ( (lv is == @StringLV) == false) then
+						[!? erreur insertKey !.new{!ErrorifArgRequiresStringValue !@location.here}]
+					end
+					############@LValue conditions = [[member mMember ] mValue]				 
+					@string conditions = "";
+					[lv getString !?conditions]
+
+					sql += "WHERE "+conditions+" "
+				end
+			end
+			#
+		end
+
 	end
 
 
