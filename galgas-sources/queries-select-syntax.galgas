@@ -154,8 +154,12 @@ override method @SelectQuery toSql
 	@LocalError erreur = {};
 	@string ErrorifArgsRequired = "If-args-required";
 	@string ErrorifArgRequiresStringValue = "If-Arg-Requires-String-Value";
+	@string ErrorOrderArgRequiresStringValue = "Order-Arg-Requires-String-Value";
+	@string ErrorLimitArgRequiresStringValue = "Limit-Arg-Requires-String-Value";
 	[!? erreur insertKey !.new{!ErrorifArgsRequired !@location.here}]
 	[!? erreur insertKey !.new{!ErrorifArgRequiresStringValue !@location.here}]
+	[!? erreur insertKey !.new{!ErrorOrderArgRequiresStringValue !@location.here}]
+	[!? erreur insertKey !.new{!ErrorLimitArgRequiresStringValue !@location.here}]
 
 	sql = "";
 	sql += "/* Requete SELECT `"+name.string +"` */\n";
@@ -192,13 +196,31 @@ override method @SelectQuery toSql
 
 	sql += "`"+ table +"` " ;
 
-	# les conditions et autres directives sql
+	# WHERE
 	# ---------------------------------------------------
 	@string conditions = .default
 	[self getIfParameterToString !?conditions ![parameters mLvalue] !ErrorifArgRequiresStringValue !erreur ] 
 
 	if ([conditions length] > 0) then
 		sql += "WHERE "+conditions+" "
+	end
+
+	# ORDER
+	# ---------------------------------------------------
+	@string order = .default
+	[self getOrderParameterToString !?order ![parameters mLvalue] !ErrorOrderArgRequiresStringValue !erreur ] 
+
+	if ([order length] > 0) then
+		sql += "ORDER BY "+order+" "
+	end
+
+	# LIMIT
+	# ---------------------------------------------------
+	@string limit = .default
+	[self getLimitParameterToString !?limit ![parameters mLvalue] !ErrorLimitArgRequiresStringValue !erreur ] 
+
+	if ([limit length] > 0) then
+		sql += "LIMIT "+limit+" "
 	end
 
 

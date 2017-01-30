@@ -157,3 +157,47 @@ method @Query getIfParameterToString
 		end
 	end 
 }
+
+method @Query getOrderParameterToString
+	?! @string order
+	? @MemberList mlist
+	? @string ErrorOrderArgRequiresStringValue
+	? @LocalError erreur
+	{ 
+
+	#si des paramètres ont été fournis 
+	for member in mlist do 
+		if ( [[member mMember] mKey] == "order" ) then 
+			@Member m = [member mMember]
+			@LValue lv = [m mValue]
+			if ( (lv is == @StringLV) == false) then
+				[!? erreur insertKey !.new{!ErrorOrderArgRequiresStringValue !@location.here}]
+			end
+
+			[lv getString !?order]
+			
+		end
+	end 
+}
+
+method @Query getLimitParameterToString
+	?! @string limit
+	? @MemberList mlist
+	? @string ErrorLimitArgRequiresStringValue
+	? @LocalError erreur
+	{ 
+
+	#si des paramètres ont été fournis 
+	for member in mlist do 
+		if ( [[member mMember] mKey] == "limit" ) then 
+			@Member m = [member mMember]
+			@LValue lv = [m mValue]
+			if ( (lv is == @StringLV) == false) then
+				[!? erreur insertKey !.new{!ErrorLimitArgRequiresStringValue !@location.here}]
+			end
+
+			[lv getString !?limit]
+			
+		end
+	end 
+}
