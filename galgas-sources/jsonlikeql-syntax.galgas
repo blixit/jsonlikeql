@@ -36,7 +36,7 @@ rule <start_symbol> {
 	$queries$ ${$ 	
 	repeat
 	while
-		<queries_container> !? queryMap !? functionsMap
+		<queries_container> !? queryMap !? functionsMap ! classMap
 	end
 	$}$ 
 

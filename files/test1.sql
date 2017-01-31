@@ -4,9 +4,9 @@
 * Author : Blixit
 */
 /* Requete SELECT `test` */
-SELECT adresse1, age, message, name, otherfield FROM `Montype` WHERE age > 18 AND name = 'blixit'  ;
+SELECT adresse1 FROM `Montype` WHERE age > 18 AND name = 'blixit'  ORDER BY id LIMIT 50 ;
 /* Requete SELECT `aire` */
-SELECT * FROM `Montype2` ;
+SELECT * FROM `Real` ;
 /* Requete MUTATE `ajouterUser` */
 INSERT INTO `User` ( age, id, logement, name ) VALUES (15, '5', 5, "alain") ;
 /* Requete MUTATE `funct` */

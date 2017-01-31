@@ -9,7 +9,9 @@ Montype{
 	reel:Real,
 	char:Char,
 	string:String,
-	montype:Montype2
+	montype:Montype2,
+	adresse1:String
+
 }
 Montype2{
 	id:Bool, 
@@ -23,9 +25,9 @@ Montype3{
 
 functions {
 	:
-		test({if:["id > 5 AND name = 'coucou' "]}) -> Montype 
+		test({if:["id > 5 AND name = 'coucou' "],order:"id",limit:"50"}) -> Montype 
 	:
-		aire -> Montype2
+		aire -> Real
 	+ 
 		ajouterUser()->[User]
 	-
@@ -37,14 +39,10 @@ functions {
 }
 
 queries {
-	:test({if:"age > 18 AND name = 'blixit' " , kl:"re", array:[]}) propagate default{
-		age{},
+	:test({if:"age > 18 AND name = 'blixit' " , kl:"re", array:[]}) propagate default{ 
 		adresse1 {
 			id
-		},
-		name,
-		otherfield,
-		message
+		}
 	}
 	:aire 
 	+ajouterUser(){ 

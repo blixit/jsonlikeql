@@ -54,6 +54,7 @@ syntax extension jsonlikeql_syntax {
 rule <queries_container> 
 	?! @QueryMap queryMap
 	?! @FunctionsMap functionsMap
+	? @ClassMap classMap
 	{  
 
 	@lchar queryType = .default;
@@ -62,7 +63,7 @@ rule <queries_container>
 
 		@Query query = .default;
 
-	 	<query> ! queryType !? query ! functionsMap
+	 	<query> ! queryType !? query ! functionsMap ! classMap
 
 	 	@lstring key = @lstring.new{![[queryMap count] string] !@location.here}; 
 	 	[!? queryMap insertKey !key !query] 
@@ -70,7 +71,7 @@ rule <queries_container>
 		repeat
 		while
 			query = @Query.default;
-			<query> ! queryType !? query ! functionsMap
+			<query> ! queryType !? query ! functionsMap ! classMap
 			key = @lstring.new{![[queryMap count] string] !@location.here}; 
 	 		[!? queryMap insertKey !key !query] 
 		end

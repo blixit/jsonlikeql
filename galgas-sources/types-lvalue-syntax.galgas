@@ -205,3 +205,36 @@ method @LValue toString
 		[!? erreur insertKey !.new{!ErrorArrayValueNotAllowed !@location.here}] 
 	end
 }
+
+method @LValue isPrimitive
+	?! @bool isprimitive
+	{
+
+	isprimitive = false;
+
+	if( (self is == @IntegerLV) || (self is == @DoubleLV) 
+	|| (self is == @CharLV )
+	|| (self is == @StringLV )
+	|| (self is == @BoolLV) ) then   
+		isprimitive = true;  
+	end
+}
+
+func isPrimitive 
+	? @string typeName
+	-> @bool isit {
+
+	isit = false;
+	
+	if( 
+		typeName == "Int" 
+		|| typeName == "Real" 
+		|| typeName == "Char" 
+		|| typeName == "String" 
+		|| typeName == "Bool" 
+	) then
+		isit = true;
+	end
+
+	
+}

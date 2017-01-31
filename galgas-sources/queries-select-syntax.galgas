@@ -16,7 +16,8 @@ rule <query>
 	? @lchar queryType
 	?! @Query query
 	? @FunctionsMap functionsMap
-	{ 
+	? @ClassMap classMap
+	{  
 
 	# Construction de l'arbre
 	#----------------------------------------------------------------
@@ -47,12 +48,67 @@ rule <query>
 	# Vérifications
 	#----------------------------------------------------------------
 
+	@lstring returnedType = .default
+	#getFunctionReturnedType( !name !functionsMap !? returnedType);
+
+	with [name string] in !?functionsMap 
+	do
+		# 1. Récupération des données relative à la fonction
+
+		returnedType  =  [function returnedType] 
+
+		# check parameters : compare les paramètres entrés aux paramètres attendus
+		# Principe : 
+		# si un paramètre de la fonction n'est pas dans la liste des paramètres fournis, on l'ajoute
+		@ObjectLV fct_params = [function parameters]
+
+		for () f_ in [fct_params mLvalue]
+		do 
+			# si le paramètre n'est pas écrasé, on le rajoute
+			@bool existe = false;
+			for () q_ in [parameters mLvalue]
+			do 				
+				if ([f_mMember mKey] == [q_mMember mKey]) then 
+					existe = true;
+				end 
+			end
+
+			if ( existe == false) then 
+				@MemberList members = [parameters mLvalue];
+				members += !f_mMember;
+				parameters = @ObjectLV.new{!@location.here !members}; 
+			end
+		end
+
+		# si la fonction retourne un objet primitf (int, reel, char, ... ) elle n'attend qu'un seul paramètre, sinon elle peut en prendre plusieurs
+		if(isPrimitive(!returnedType) == true) then 
+			# message name.string + " returns " + returnedType.string + "\n"
+		else
+			@Class aclass = .default;
+			[classMap searchKey !returnedType ?aclass]
+			
+			@PropertiesMap props = [aclass properties]
+
+			# check fields of returnedType
+			for () q_ in fieldsQ
+			do
+				#log q_query
+				[props searchKey ![q_query name] ?*]
+			end
+		end
+
+		
+
+
+
+	else
+		# 2. la requete n'appelle pas une fonction existante
+
+		returnedType.string = ""
+	end 
 
 	# Construction de la requete
 	#----------------------------------------------------------------
-
-	@lstring returnedType = .default
-	getFunctionReturnedType( !name !functionsMap !? returnedType);
 
 	query = @SelectQuery.new{ !name !@lchar.new{!queryType !@location.here}  !parameters !returnedType !fieldsQ !propagation }
 
@@ -116,7 +172,6 @@ rule <field>
 	@lstring returnedType  =  .default
 
 	query = @SelectQuery.new{ !name !@lchar.new{!queryType !@location.here}  !parameters !returnedType !fieldsQ !propagation }
-
 }
 
 rule <propagation> 
@@ -145,6 +200,17 @@ func checkPropagation
 	pass = false;
 
 	pass = true;
+}
+
+# Cette fonction parcours l'arbre et rajoute les informations manquantes, notamment sur la propagation
+method @SelectQuery decorateQuery
+	? @FunctionsMap listeDesFonctions
+	{
+	
+	@Function function = .default;
+	log name
+	@lstring key = .default
+	[listeDesFonctions searchKey !name ?* ]
 }
 
 override method @SelectQuery toSql 
